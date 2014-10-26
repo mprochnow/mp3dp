@@ -16,10 +16,10 @@ q = 4 * 40; // quality for cylinders
 module magnet_holder() {
     difference() {
         hull() {
-            translate([0, -6.26, 1.74]) rotate([135, 0, 0]) translate([0, 0, 0])cylinder(h=h_magnet + t_wall, r=r_magnet + 2, center=true, $fn=q);
+            translate([0, -6.37, 1.74]) rotate([135, 0, 0]) translate([0, 0, 0])cylinder(h=h_magnet + t_wall, r=r_magnet + 2, center=true, $fn=q);
             translate([0, 0, 0]) cube([d_magnet + t_wall, 0.1, d_magnet + t_wall + t_wall + 1], center=true);
         }
-         translate([0, -6.26, 1.74]) rotate([135, 0, 0]) translate([0, 0, t_wall / 2])cylinder(h=h_magnet + 1, r=r_magnet, center=true, $fn=q);
+        translate([0, -6.37, 1.74]) rotate([135, 0, 0]) translate([0, 0, t_wall / 2])cylinder(h=h_magnet + 1, r=r_magnet, center=true, $fn=q);
     }
 };
 
