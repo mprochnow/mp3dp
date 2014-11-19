@@ -24,34 +24,34 @@ module bearing_mount() {
         union() {
             difference() {
                 union() {
-                        cylinder(r=r_bearing + t_wall, h=h_bearing, center=true, $fn=q);
+                    rotate([0, 0, 22.5])
+                        cylinder(r=r_bearing + t_wall + 0.92, h=h_bearing, center=true, $fn=8);
 
                     hull() {
                         translate([0, -4.7, 0])
-                            cube([d_magnet + 4, 1, h_bearing], center=true);
+                            cube([d_magnet + 2.6, 1, h_bearing], center=true);
                         
-                        translate([0, -15, 2.7]) 
+                        translate([0, -15, 3.22]) 
                         rotate([135, 0, 0])
-                        difference() {
-                                cylinder(h=h_magnet + 1, r=r_magnet + 2, center=true, $fn=q);
+                        rotate([0, 0, 22.5])
+                            cylinder(h=h_magnet + 1, r=r_magnet + 2, center=true, $fn=8);
+                    }
 
-                        }
-                    }
-                   
                     translate([distance_rod/4, -(t_plate/2 + w_belt/2 + 2.12), 0])
-                       cube([distance_rod/2, t_plate, h_bearing], center=true);
-                       
-                    translate([15, -1, 0])
-                    difference() {
-                        cube([10, 10, h_bearing], center=true);
-                        translate([5, 5, 0])
-                            cylinder(r=10, h=h_bearing + 1, center=true, $fn=q);
-                    }
+                        cube([distance_rod/2, t_plate, h_bearing], center=true);
+
+                    translate([-6.83 , -(t_plate/2 + w_belt/2 + 2.12), -1.5])
+                        cube([4.2, t_plate, h_bearing - 3], center=true);
+
+                    translate([r_bearing + t_wall, -6, 0])
+                    rotate([0, 0, 45])
+                        cube([5, 5, h_bearing], center=true);
                 }
                 
                 cylinder(r=r_bearing, h=h_bearing + 1, center=true, $fn=q);
             }
 
+            translate([0,0.9,0])
             difference() {            
                 intersection() {
                     translate([0, 13, 0])
@@ -77,7 +77,7 @@ module bearing_mount() {
             }
         }
         
-        translate([0, -15, 2.7])
+        translate([0, -15, 3.22])
         rotate([135, 0, 0])
         translate([0, 0, 1])
             cylinder(h=h_magnet + 1, r=r_magnet, center=true, $fn=q);
@@ -126,8 +126,8 @@ module carriage() {
        
         // belt tensioner
         difference() {
-            translate([(distance_rod - d_bearing) / 4 - 1.5, -2, -(h_bearing/4) - 1])
-                cube([(distance_rod - d_bearing) / 2 + 3, w_belt + 4.2, h_bearing/2 - 2], center=true);
+            translate([(distance_rod - d_bearing) / 4 - 1.5, -0.43, -(h_bearing/4) - 1])
+                cube([(distance_rod - d_bearing) / 2 + 3, w_belt + 3.5, h_bearing/2 - 2], center=true);
         
             translate([12, 0, -6])
             rotate([0, 0, 30])
