@@ -129,25 +129,37 @@ module carriage() {
             translate([(distance_rod - d_bearing) / 4 - 1.5, -0.43, -(h_bearing/4) - 1])
                 cube([(distance_rod - d_bearing) / 2 + 3, w_belt + 3.5, h_bearing/2 - 2], center=true);
         
-            translate([12, 0, -6])
+            translate([12, 0, -5])
             rotate([0, 0, 30])
-                m3_nut(width=5.8, thickness=6);
+                m3_nut(width=5.8, thickness=8);
 
-            translate([12, 2, -6])
-                cube([5.8, 6, 6], center=true);    
+            translate([12, 2, -5])
+                cube([5.8, 6, 8], center=true);    
 
             translate([12, 0, -10])
                 cylinder(r=1.65, h=10, center=true, $fn=q);
 
-            translate([2, 0, -6])
+            translate([2, 0, -5])
             rotate([0, 0, 30])
-                m3_nut(width=5.8, thickness=6);
+                m3_nut(width=5.8, thickness=8);
 
-            translate([2, 2, -6])
-                cube([5.8, 6, 6], center=true);    
+            translate([2, 2, -5])
+                cube([5.8, 6, 8], center=true);    
 
             translate([2, 0, -10])
                 cylinder(r=1.65, h=10, center=true, $fn=q);
+        }
+        
+        translate([-(23-12), -(7.1/2 + 8 / 2 + 1 + 5 + 2.5), 0])
+        difference() {
+            union() {
+                translate([0, 5, 0])
+                    cube([9.24, 10, h_bearing], center=true);
+
+                rotate([0, 0, 22.5])
+                    cylinder(r=5, h=h_bearing, center=true, $fn=8);
+            }
+                cylinder(r=2.5/2, h=h_bearing+1, center=true, $fn=q);
         }
     }
 };
