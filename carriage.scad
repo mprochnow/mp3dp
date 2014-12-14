@@ -1,5 +1,6 @@
 include <timing_belts.scad>
 include <m3.scad>
+include <polyhole.scad>
 
 tolerance        = 0.3;
 
@@ -10,23 +11,24 @@ t_wall           = 4;
 t_plate          = 6;
 distance_rod     = 60; // middle to middle
 w_plate          = distance_rod - 2 * (r_bearing);
-distance_magnets = 40;
+distance_magnets = 60;
 d_magnet         = 15 + tolerance; // outer diameter of magnet
 r_magnet         = d_magnet / 2;
 h_magnet         = 6; // h_bearing of magnet
 w_belt           = 7;
 h_belt_mount     = h_bearing / 2;
 
-q = 2 * 40; // quality for cylinders
 
 module bearing_mount() {
     difference() {
         union() {
             difference() {
                 union() {
+                    // outer hull of bearing mount
                     rotate([0, 0, 22.5])
                         cylinder(r=r_bearing + t_wall + 0.92, h=h_bearing, center=true, $fn=8);
 
+                    // magnet mount
                     hull() {
                         translate([0, -4.7, 0])
                             cube([d_magnet + 2.6, 1, h_bearing], center=true);
@@ -37,6 +39,7 @@ module bearing_mount() {
                             cylinder(h=h_magnet + 1, r=r_magnet + 2, center=true, $fn=8);
                     }
 
+                    // plate
                     translate([distance_rod/4, -(t_plate/2 + w_belt/2 + 2.12), 0])
                         cube([distance_rod/2, t_plate, h_bearing], center=true);
 
@@ -48,31 +51,32 @@ module bearing_mount() {
                         cube([5, 5, h_bearing], center=true);
                 }
                 
-                cylinder(r=r_bearing, h=h_bearing + 1, center=true, $fn=q);
+                // hole for bearing
+                polyhole(h_bearing+1, d_bearing);
             }
 
             translate([0,0.9,0])
             difference() {            
                 intersection() {
                     translate([0, 13, 0])
-                        cube([12, 9, h_bearing], center=true);
+                        cube([12, 11, h_bearing], center=true);
 
                     scale([1.0, 1.0, 1.5])
                     rotate([45, 0, 0])
-                        cube([12, h_bearing*1.16, h_bearing*1.16], center=true);
+                        cube([12, h_bearing*1.25, h_bearing*1.25], center=true);
                 }
                 
                 translate([0, 13.5, 0])
                 rotate([90, 0, 90])
                 union() {
-                    cylinder(r=1.5, h=17, center=true, $fn=q);
+                    polyhole(17, 3.3);
 
                     translate([0, 0, 6])
                     rotate([0, 0, 30])
-                        m3_nut();
+                        m3_nut(width=5.8);
 
-                    translate([0, 0, -6])       
-                        cylinder(r=2.7, h=3, center=true, $fn=q);
+                    translate([0, 0, -6])
+                        polyhole(3, 5.7);     
                 }
             }
         }
@@ -80,7 +84,7 @@ module bearing_mount() {
         translate([0, -15, 3.22])
         rotate([135, 0, 0])
         translate([0, 0, 1])
-            cylinder(h=h_magnet + 1, r=r_magnet, center=true, $fn=q);
+            polyhole(h_magnet + 1, d_magnet);
 
         translate([0, 10, 0])            
             cube([2.5, 20, h_bearing + 1], center=true);
@@ -137,7 +141,7 @@ module carriage() {
                 cube([5.8, 6, 8], center=true);    
 
             translate([12, 0, -10])
-                cylinder(r=1.65, h=10, center=true, $fn=q);
+                polyhole(10, 3.3);
 
             translate([2, 0, -5])
             rotate([0, 0, 30])
@@ -147,7 +151,7 @@ module carriage() {
                 cube([5.8, 6, 8], center=true);    
 
             translate([2, 0, -10])
-                cylinder(r=1.65, h=10, center=true, $fn=q);
+                polyhole(10, 3.3);
         }
         
         translate([-(23-12), -(7.1/2 + 8 / 2 + 1 + 5 + 2.5), 0])
@@ -159,7 +163,7 @@ module carriage() {
                 rotate([0, 0, 22.5])
                     cylinder(r=5, h=h_bearing, center=true, $fn=8);
             }
-                cylinder(r=2.5/2, h=h_bearing+1, center=true, $fn=q);
+                polyhole(h_bearing + 1, 2.5);
         }
     }
 };
