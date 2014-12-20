@@ -1,13 +1,13 @@
 play             = 0.3;
-d_magnet         = 15 + play; // outer diameter of magnet
+d_magnet         = 15 + play;       // outer diameter of magnet
 r_magnet         = d_magnet / 2;
-h_magnet         = 6; // height of magnet
+h_magnet         = 6;               // height of magnet
 distance_magnets = 60;
-a_magnet_mount   = -45;
+a_magnet_mount   = -45;             // -90 <= a_magnet_mount <= 0
 
 module magnet_holder_slice() {
     // tilted circle projects an ellipse
-    a = r_magnet; // intersect point of ellipse with x-axis
+    a = r_magnet;                       // intersect point of ellipse with x-axis
     b = cos(a_magnet_mount) * r_magnet; // intersect point of ellipse with y-axis
 
     // polar angle of tangent
@@ -23,12 +23,7 @@ module magnet_holder_slice() {
     // intersect point with y-axis, if tilt angle is 0
     n0 = y0 - tan(30) * x0;
  
-    /////////////////////////////////////////////////////////////////////////
     // equation of straight line: y = tan(30) * x + n0;    
-    /////////////////////////////////////////////////////////////////////////
-    
-    // differenz y des schnittpunkt der tangente für phi in geradengleichung eingesetzt
-    // und y des schnittpunkt der tangente
     
     // use x-coordinate of tangent of ellipse for phi with
     // equation, subtract y-coordinate of tangent and
@@ -45,8 +40,6 @@ module magnet_holder_slice() {
             cylinder(r=r_magnet, h=h_magnet, $fn=40);
     }
 }
-
-magnet_holder_slice();
 
 for (z = [0, 120, 240]) {
     rotate([0, 0, z])
