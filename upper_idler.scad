@@ -1,9 +1,6 @@
+include <settings.scad>
 include <m3.scad>
 
-tolerance = 0.3;
-
-d_rod = 8 + tolerance;
-distance_rods = 60;
 h_idler = 20;
 q = 2 * 40;
 t_wall = 8;
