@@ -33,21 +33,16 @@ module magnet_holder_slice() {
     x = cos(30) * (tan(30) * (distance_magnets + r_magnet)) - x0;
     y = sin(30) * (tan(30) * (distance_magnets + r_magnet)) - yn;
 
-    translate([0, y, 0])
+    translate([x, y, sin(a_magnet_mount) * r_magnet])
     rotate([a_magnet_mount, 0, 0])
-    union() {
-        translate([x, 0, 0])
-            cylinder(r=r_magnet, h=h_magnet, $fn=40);
-    }
+        cylinder(r=r_magnet, h=h_magnet, $fn=40);
+
+    translate([-x, y, sin(a_magnet_mount) * r_magnet])
+    rotate([a_magnet_mount, 0, 0])
+        cylinder(r=r_magnet, h=h_magnet, $fn=40);
 }
 
 for (z = [0, 120, 240]) {
     rotate([0, 0, z])
-    union() {
-            magnet_holder_slice();
-        
-        mirror([1, 0 ,0])
-            magnet_holder_slice();
-    }
+        magnet_holder_slice();
 }
-
