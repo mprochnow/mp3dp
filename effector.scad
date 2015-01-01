@@ -1,11 +1,36 @@
 play             = 0.3;
-d_magnet         = 15 + play;       // outer diameter of magnet
+d_magnet         = 15 + 2 + play;       // outer diameter of magnet
 r_magnet         = d_magnet / 2;
-h_magnet         = 6;               // height of magnet
+h_magnet         = 6 + 2;               // height of magnet
 distance_magnets = 60;
 a_magnet_mount   = -45;             // -90 <= a_magnet_mount <= 0
 
-module magnet_holder_slice() {
+module 30mm_fan() {
+    hole_offsets = [
+        [ -12,  12],
+        [  12,  12],
+        [  12, -12],
+        [ -12, -12]
+    ];
+    
+    difference() {
+        hull() {
+            for (a = hole_offsets) {
+                translate(a)
+                    cylinder(d=4, h=10, center=true, $fn=40);
+            }
+        }
+        
+        for (a = hole_offsets) {
+            translate(a)
+                cylinder(d=3.1, h=11, center=true, $fn=20);
+        }
+        
+        cylinder(d=27.9, h=11, center=true, $fn=80);
+    }
+}
+
+module magnet_holder_slice(cutout=0) {
     // tilted circle projects an ellipse
     a = r_magnet;                       // intersect point of ellipse with x-axis
     b = cos(a_magnet_mount) * r_magnet; // intersect point of ellipse with y-axis
@@ -33,16 +58,49 @@ module magnet_holder_slice() {
     x = cos(30) * (tan(30) * (distance_magnets + r_magnet)) - x0;
     y = sin(30) * (tan(30) * (distance_magnets + r_magnet)) - yn;
 
-    translate([x, y, sin(a_magnet_mount) * r_magnet])
-    rotate([a_magnet_mount, 0, 0])
-        cylinder(r=r_magnet, h=h_magnet, $fn=40);
+    echo(y);
 
-    translate([-x, y, sin(a_magnet_mount) * r_magnet])
-    rotate([a_magnet_mount, 0, 0])
-        cylinder(r=r_magnet, h=h_magnet, $fn=40);
+    h = -sin(a_magnet_mount) * r_magnet;
+
+    if (cutout == 1) {
+        translate([x, y - sin(a_magnet_mount), h + cos(a_magnet_mount)])
+        rotate([a_magnet_mount, 0, 0])
+            cylinder(r=r_magnet - 1, h=h_magnet + 1, $fn=40);
+
+        translate([-x, y - sin(a_magnet_mount), h + cos(a_magnet_mount)])
+        rotate([a_magnet_mount, 0, 0])
+            cylinder(r=r_magnet - 1, h=h_magnet + 1, $fn=40);
+    } else {
+        translate([0, y, h])
+        rotate([a_magnet_mount, 0, 0])
+        translate([0, 0, h_magnet/2])
+            cube([2 * (x + r_magnet), d_magnet, h_magnet] , center=true);
+    }
 }
 
-for (z = [0, 120, 240]) {
-    rotate([0, 0, z])
-        magnet_holder_slice();
+*difference(){
+    magnet_holder_slice(0);
+    magnet_holder_slice(1);
 }
+
+difference() {
+    hull() {
+        for (z = [0, 120, 240]) {
+            rotate([0, 0, z])
+                magnet_holder_slice();
+        }
+    }
+    for (z = [0, 120, 240]) {
+        rotate([0, 0, z])
+        union() {
+            magnet_holder_slice(cutout=1);
+            
+            translate([-15, 0, 1])
+                cube([30, 100, 50]);
+        }
+    }
+    
+    translate([0, 0, -1])
+        cylinder(r=10, h=40, $fn=40);
+}
+
