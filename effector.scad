@@ -1,6 +1,6 @@
 include <settings.scad>
+include <polyhole.scad>
 
-play             = 0.3;
 d_magnet         = 15 + 2 + play;       // outer diameter of magnet
 r_magnet         = d_magnet / 2;
 h_magnet         = 6 + 2;               // height of magnet
@@ -134,14 +134,9 @@ module magnet_holder_slice(part) {
         translate([0, -w_fan/2, -o_fan])
         difference() {
             union() {
-                for (a = fan_hole_offsets) {
-                    translate(a)
-                        cube([5, 5, 5], center=true);
-                }
-
-                for (x = [15, -15]) {
+                for (x = [(w_fan + 0.5)/2 -3, -((w_fan + 0.5)/2 - 3)]) {
                     translate([x, 0, 0])
-                        cube([2, 29, 5], center=true);
+                        cube([6, 29, 5], center=true);
                 }
             }
             
@@ -169,22 +164,45 @@ module magnet_holder_slice(part) {
                 cube([distance_rods - d_magnet, 2, 4.45], center=true);
         }
     }
+    
+    if (part == "hotend_holder") {
+        translate([0, 0, 21 + 4.45+4.5])
+        union() {
+            difference() {
+                rotate([0, 0, 30])
+                    cylinder(r=24.6, h=4.75, $fn=3);
+
+                    cylinder(d=16 + 2*play, h=10, center=true, $fn=20);
+                
+                for (a = [60, 180, 300])
+                {
+                    rotate([0, 0, a])
+                    translate([0, 24.6 - 10.5, 0])
+                        polyhole(20, 3.3);
+                }
+            }
+            
+            translate([0, 0, 4.75])
+            difference() {
+                    cylinder(d1=20, d2=8, h=4, $fn=30);
+                
+                translate([0, 0, 1])
+                    polyhole(4, 2.5, center=false);
+            }
+            
+            difference() {
+                    cylinder(d=8, h=4.75, $fn=20);
+    
+                translate([0, 0, -1])
+                    cylinder(d=7.5, h=5, $fn=20);
+            }
+        }
+    }
 }
+
+magnet_holder_slice("hotend_holder");
 
 *union() {
-    difference(){
-        union() {
-            magnet_holder_slice("magnet_holder");
-            magnet_holder_slice("fan_holder_walls");
-        }
-        magnet_holder_slice("magnet_cutout");
-        magnet_holder_slice("fan_cutout");
-    }
-    magnet_holder_slice("hotend_mount");
-    magnet_holder_slice("fan_mount");
-}
-
-union() {
     difference() {
         union() {
             hull() {
@@ -213,9 +231,6 @@ union() {
             }
         }
         
-        *translate([0, 0, -1])
-            cylinder(r=12, h=40, $fn=40);
-
         translate([0, 0, -1])
         rotate([0, 0, 30])
             cylinder(r=17.6, h=40, $fn=3);
