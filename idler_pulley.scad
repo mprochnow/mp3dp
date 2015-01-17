@@ -1,7 +1,7 @@
 include <Pulley_T-MXL-XL-HTD-GT2_N-tooth.scad>
 
-motor_shaft = 11.3;
-teeth=20;
+motor_shaft = 13.3;
+teeth=22;
 profile=5;
 idler_ht=1;
 pulley_t_ht=6.3;
@@ -12,7 +12,7 @@ difference() {
     cylinder(d=motor_shaft+6.2, h=idler_ht, $fn=80);
     
     translate([0, 0, -1])
-        cylinder(r=9.5/2, h=12, $fn=80);    
+        cylinder(d=10, h=12, $fn=80);    
 }
 
 // part 2
@@ -26,6 +26,6 @@ difference() {
     }
     
     translate([0, 0, -1])
-        cylinder(r=9.4/2, h=12, $fn=80);    
+        cylinder(d=10, h=12, $fn=80);    
 }
 
