@@ -1,13 +1,13 @@
 include <settings.scad>
 include <polyhole.scad>
 
-d_magnet         = 15 + 2 + play;       // outer diameter of magnet
+d_magnet         = 15 + play;       // outer diameter of magnet
 r_magnet         = d_magnet / 2;
-h_magnet         = 6 + 2;               // height of magnet
+h_magnet         = 6;               // height of magnet
 distance_magnets = 60;
 a_magnet_mount   = -45;             // -90 <= a_magnet_mount <= 0
 
-o_fan = 1; // vertical offset of fan
+o_fan = 0; // vertical offset of fan
 h_fan = 10;
 w_fan = 30;
 a_fan = -45;
@@ -20,6 +20,7 @@ fan_hole_offsets = [
 
 
 module 30mm_fan() {
+    translate([0, 0, h_fan/2])
     difference() {
         cube([w_fan, w_fan, h_fan], center=true);
         
@@ -51,9 +52,9 @@ module hotend() {
         cube([15, 17, 10], center=true);
 }
 
-module magnet_holder_slice(part) {
+module magnet_holder_slice() {
     // tilted circle projects an ellipse
-    a = r_magnet;                       // intersect point of ellipse with x-axis
+    a = r_magnet; // intersect point of ellipse with x-axis
     b = cos(a_magnet_mount) * r_magnet; // intersect point of ellipse with y-axis
 
     // polar angle of tangent
@@ -69,7 +70,9 @@ module magnet_holder_slice(part) {
     // intersect point with y-axis, if tilt angle is 0
     n0 = y0 - tan(30) * x0;
  
+    /////////////////////////////////////////////////////////////////////////
     // equation of straight line: y = tan(30) * x + n0;    
+    /////////////////////////////////////////////////////////////////////////
     
     // use x-coordinate of tangent of ellipse for phi with
     // equation, subtract y-coordinate of tangent and
@@ -81,188 +84,105 @@ module magnet_holder_slice(part) {
 
     h = -sin(a_magnet_mount) * r_magnet;
 
-    if (part == "magnet_holder") {
-        translate([0, y, h])
-        rotate([a_magnet_mount, 0, 0])
-        translate([0, 0, h_magnet/2])
-            cube([2 * (x + r_magnet), d_magnet, h_magnet] , center=true);
-    }
-
-    if (part == "magnet_cutout") {
-        translate([x, y - sin(a_magnet_mount), h + cos(a_magnet_mount)])
-        rotate([a_magnet_mount, 0, 0])
-            cylinder(r=r_magnet - 1, h=h_magnet + 1, $fn=40);
-
-        translate([-x, y - sin(a_magnet_mount), h + cos(a_magnet_mount)])
-        rotate([a_magnet_mount, 0, 0])
-            cylinder(r=r_magnet - 1, h=h_magnet + 1, $fn=40);
-    }
-    
-    w_fan_holder =   y
-                   + cos(a_magnet_mount) * r_magnet
-                   - sin(a_magnet_mount) * h_magnet;
-
-    h_fan_holder = 4.45 + 21;
-    
-    h_fan_cutout = cos(a_fan) * w_fan - sin(a_fan)*h_fan;
-    
-    if (part == "fan_cutout") {
-        translate([-(w_fan + 0.5)/2, 0, o_fan])
-            cube([w_fan + 0.5, 100, h_fan_cutout]);
-    }
-    
-    if (part == "fan_holder_walls") {
-        difference() {
-            translate([0, w_fan_holder/2, h_fan_holder/2])
-                cube([distance_rods - d_magnet, w_fan_holder, h_fan_holder], center=true);
-        
-            translate([0, w_fan_holder, cos(a_magnet_mount) * h_magnet])
-            rotate([a_fan, 0, 0])
-            translate([0, 0, h_fan_holder/2])
-                cube([distance_rods - d_magnet + 1, 3*w_fan_holder, h_fan_holder], center=true);
-        
-            translate([0, w_fan_holder + sin(a_magnet_mount) * h_magnet, 0])
-            rotate([(90 + a_magnet_mount), 0, 0])
-            translate([0, 0, -h_fan_holder/2])
-                cube([distance_rods - d_magnet + 1, 3*w_fan_holder, h_fan_holder], center=true);
-        }
-    }
-
-    if (part == "fan_mount") {
-        translate([0, w_fan_holder + sin(a_magnet_mount) * h_magnet, 0])
-        rotate([-45, 0, 0])
-        translate([0, -w_fan/2, -o_fan])
-        difference() {
-            union() {
-                for (x = [(w_fan + 0.5)/2 -3, -((w_fan + 0.5)/2 - 3)]) {
-                    translate([x, 0, 0])
-                        cube([6, 29, 5], center=true);
-                }
-            }
-            
-            for (a = fan_hole_offsets) {
-                translate(a)
-                    cylinder(d=2.5, h=6, center=true, $fn=20);
-            }
-        }
-    }
-    
-    if (part == "hotend_mount") {
-        translate([0, 0, 21 + 4.45 + 2.25])
-        union() {
-            difference() {
-                rotate([0, 0, 30])
-                    cylinder(r=24.6, h=4.45, center=true, $fn=3);
-                
-                    cylinder(d=11.92, h=4.5+1, center=true, $fn=20);
-
-                translate([0, -15, 0])
-                    cube([distance_rods - d_magnet + 1, 30, 4.45 + 1], center=true);
-            }
-            
-            translate([0, 1 + cos(60)*24.6, 0])
-                cube([distance_rods - d_magnet, 2, 4.45], center=true);
-        }
-    }
-    
-    if (part == "hotend_holder") {
-        translate([0, 0, 21 + 4.45+4.5])
-        union() {
-            difference() {
-                rotate([0, 0, 30])
-                    cylinder(r=24.6, h=4.75, $fn=3);
-
-                    cylinder(d=16 + 2*play, h=10, center=true, $fn=20);
-                
-                for (a = [60, 180, 300])
-                {
-                    rotate([0, 0, a])
-                    translate([0, 24.6 - 10.5, 0])
-                        polyhole(20, 3.3);
-                }
-            }
-            
-            translate([0, 0, 4.75])
-            difference() {
-                    cylinder(d1=20, d2=8, h=4, $fn=30);
-                
-                translate([0, 0, 1])
-                    polyhole(4, 2.5, center=false);
-            }
-            
-            difference() {
-                    cylinder(d=8, h=4.75, $fn=20);
-    
-                translate([0, 0, -1])
-                    cylinder(d=7.5, h=5, $fn=20);
-            }
-        }
+    translate([0, y, h])
+    rotate([a_magnet_mount, 0, 0])
+    union() {
+        translate([x, 0, 0])
+            cylinder(r=r_magnet, h=h_magnet, $fn=40);
     }
 }
 
-magnet_holder_slice("hotend_holder");
+ww = cos(a_fan)*w_fan + 2;
 
-*union() {
+union() {
     difference() {
         union() {
-            hull() {
-                for (z = [0, 120, 240]) {
-                    rotate([0, 0, z])
-                        magnet_holder_slice("magnet_holder");
-                }
-            }
-            
-            for (z = [0, 120, 240]) {
-                rotate([0, 0, z])
-                    magnet_holder_slice("fan_holder_walls");
-            }
-        }
-        
-        for (z = [0, 120, 240]) {
-            rotate([0, 0, z])
-            union() {
-                magnet_holder_slice("magnet_cutout");
-                magnet_holder_slice("fan_cutout");
+            rotate([0, 0, 30])
+                cylinder(r=w_fan/2/sin(60), h=cos(a_fan)*w_fan, $fn=3);
+
+            for (a = [0, 120, 240]) {
+                rotate([0, 0, a])
+                difference() {
+                    translate([0, ww/2 + (sqrt(3)/2*w_fan)/3, cos(a_fan)*w_fan/2])
+                        cube([w_fan, ww, cos(a_fan)*w_fan], center=true);
                 
-                if (z == 240) {
-                    translate([0, 8.7, -2])
-                        magnet_holder_slice("fan_cutout");
+                    translate([0, ww + (sqrt(3)/2*w_fan)/3, 0])
+                    rotate([-45, 0, 0])
+                    translate([0, -w_fan/2, h_fan])
+                        cube([w_fan + 1, w_fan + 1, h_fan*2], center=true);
+
                 }
             }
         }
         
-        translate([0, 0, -1])
+        for (a = [0, 120, 240]) {
+            rotate([0, 0, a])
+            translate([0, ww/2 + (sqrt(3)/2*w_fan)/3 + 2, (cos(a_fan)*w_fan)/2])
+                cube([w_fan-2, 30, cos(a_fan)*w_fan - 2], center=true);
+        }
+    
+        translate([0, 0, 1])
         rotate([0, 0, 30])
-            cylinder(r=17.6, h=40, $fn=3);
-    }
+            cylinder(r=(w_fan-2)/2/sin(60), h=cos(a_fan)*w_fan - 2, $fn=3);
     
-    difference() {
-        union() {
-            for (z = [0, 120, 240]) {
-                rotate([0, 0, z])
-                    magnet_holder_slice("hotend_mount");
-            
-                if (z != 240) {
-                    rotate([0, 0, z])
-                        magnet_holder_slice("fan_mount");
+        rotate([0, 0, 120])
+        translate([0, ww/2 + (sqrt(3)/2*w_fan)/3 + 1.9, 0])
+            cube([w_fan-2, cos(a_fan)*w_fan - 6, 4], center=true);
+
+        translate([0, 0, -1])
+            cylinder(d=16.5, h=30, $fn=40);
+    }
+
+    for (a = [120, 240]) {
+        rotate([0, 0, a])
+        translate([0, ww + (sqrt(3)/2*w_fan)/3, 0])
+        rotate([-45, 0, 0])
+        translate([0, -w_fan/2, -1.5])
+        difference() {
+            for (x = [-w_fan/2, w_fan/2]) {
+                for (y = [-w_fan/2, w_fan/2]) {
+                    translate([x, y, 0])
+                    intersection() {
+                        cylinder(d=14, h=3, $fn=20);
+                        
+                        translate([x/(w_fan/2)*-3.5, y/(w_fan/2)*-3.5, 0])
+                            cube([7, 7, 3], center=true);
+                    }
                 }
             }
+
+            for (p = fan_hole_offsets) {
+                translate([0, 0, 0])
+                translate(p)
+                    cylinder(d=2.5, h=4, $fn=20, center=true);
+            }
         }
-        rotate([0, 0, 240])
-        translate([0, 25, 21 + 4.45 + 2.25])            
-            cube([11.92, 50, 4.5+1], center=true);
+    }
+
+    rotate([0, 0, 120])
+    translate([0, (sqrt(3)/2*w_fan)/3 + 0.5, (cos(a_fan)*w_fan)/2])
+        cube([w_fan-2, 1, cos(a_fan)*w_fan], center=true);
+}
+
+*for (a = [0, 120, 240]) {
+    rotate([0, 0, a])
+    union() {
+            magnet_holder_slice();
         
-        translate([0, 0, -5])
-            cube([100, 100, 10], center=true);
+        mirror([1, 0 ,0])
+            magnet_holder_slice();
     }
 }
 
-*translate([0, 0, (21 + 4.45 + 2.25)])
-rotate([0, 0, 240])
+#translate([0, 0, (21 + 4.45 + 2.25)])
+rotate([0, 0, 0])
     hotend();
 
-*translate([0, 36.992-w_fan/2, o_fan + cos(a_fan)*w_fan/2])
-rotate([-45, 0, 0])
-translate([0, 0, h_fan/2])
-    30mm_fan();
+*for (a = [120, 240]) {
+    rotate([0, 0, a])
+    translate([0, ww + (sqrt(3)/2*w_fan)/3, 0])
+    rotate([-45, 0, 0])
+    translate([0, -w_fan/2, 0])
+        30mm_fan();
+}
 
