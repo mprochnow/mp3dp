@@ -1,16 +1,19 @@
 include <settings.scad>
 include <polyhole.scad>
 
-d_magnet         = 15 + play;       // outer diameter of magnet
+include <m3.scad>
+
+d_magnet         = 15 + 3 + 0.6;       // outer diameter of magnet
 r_magnet         = d_magnet / 2;
-h_magnet         = 6;               // height of magnet
+h_magnet         = 4;               // height of magnet
 distance_magnets = 60;
-a_magnet_mount   = -45;             // -90 <= a_magnet_mount <= 0
+a_magnet_mount   = -58;             // -90 <= a_magnet_mount <= 0
 
 o_fan = 0; // vertical offset of fan
 h_fan = 10;
 w_fan = 30;
-a_fan = -45;
+a_fan = 58;
+
 fan_hole_offsets = [
     [ -12,  12, 0],
     [  12,  12, 0],
@@ -84,104 +87,335 @@ module magnet_holder_slice() {
 
     h = -sin(a_magnet_mount) * r_magnet;
 
-    translate([0, y, h])
-    rotate([a_magnet_mount, 0, 0])
-    union() {
-        translate([x, 0, 0])
-            cylinder(r=r_magnet, h=h_magnet, $fn=40);
-    }
-}
-
-ww = cos(a_fan)*w_fan + 2;
-
-union() {
     difference() {
         union() {
-            rotate([0, 0, 30])
-                cylinder(r=w_fan/2/sin(60), h=cos(a_fan)*w_fan, $fn=3);
+            translate([0, y, h])
+            rotate([a_magnet_mount, 0, 0])
+            translate([x, 0, 0])
+                cylinder(d=d_magnet, h=h_magnet, $fn=40);
 
-            for (a = [0, 120, 240]) {
-                rotate([0, 0, a])
-                difference() {
-                    translate([0, ww/2 + (sqrt(3)/2*w_fan)/3, cos(a_fan)*w_fan/2])
-                        cube([w_fan, ww, cos(a_fan)*w_fan], center=true);
+            rotate([0, 0, 240])
+            translate([0, y, h])
+            rotate([a_magnet_mount, 0, 0])
+            translate([-x, 0, 0])
+                cylinder(d=d_magnet, h=h_magnet, $fn=40);
                 
-                    translate([0, ww + (sqrt(3)/2*w_fan)/3, 0])
-                    rotate([-45, 0, 0])
-                    translate([0, -w_fan/2, h_fan])
-                        cube([w_fan + 1, w_fan + 1, h_fan*2], center=true);
+            hull() {
+                translate([0, y, h])
+                rotate([a_magnet_mount, 0, -0.1])
+                translate([x, 0, 0])
+                    cylinder(d=d_magnet, h=0.1, $fn=40);
 
-                }
+                rotate([0, 0, 240])
+                translate([0, y, h])
+                rotate([a_magnet_mount, 0, -0.1])
+                translate([-x, 0, 0])
+                    cylinder(d=d_magnet, h=0.1, $fn=40);
             }
         }
         
-        for (a = [0, 120, 240]) {
-            rotate([0, 0, a])
-            translate([0, ww/2 + (sqrt(3)/2*w_fan)/3 + 2, (cos(a_fan)*w_fan)/2])
-                cube([w_fan-2, 30, cos(a_fan)*w_fan - 2], center=true);
+        union() {
+            translate([0, y, h])
+            rotate([a_magnet_mount, 0, 0])
+            translate([x, 0, 1])
+                cylinder(d=d_magnet-3, h=h_magnet, $fn=40);
+        
+            rotate([0, 0, 240])
+            translate([0, y, h])
+            rotate([a_magnet_mount, 0, 0])
+            translate([-x, 0, 1])
+                cylinder(d=d_magnet-3, h=h_magnet, $fn=40);
         }
-    
-        translate([0, 0, 1])
-        rotate([0, 0, 30])
-            cylinder(r=(w_fan-2)/2/sin(60), h=cos(a_fan)*w_fan - 2, $fn=3);
-    
-        rotate([0, 0, 120])
-        translate([0, ww/2 + (sqrt(3)/2*w_fan)/3 + 1.9, 0])
-            cube([w_fan-2, cos(a_fan)*w_fan - 6, 4], center=true);
-
-        translate([0, 0, -1])
-            cylinder(d=16.5, h=30, $fn=40);
     }
+}
 
-    for (a = [120, 240]) {
-        rotate([0, 0, a])
-        translate([0, ww + (sqrt(3)/2*w_fan)/3, 0])
-        rotate([-45, 0, 0])
-        translate([0, -w_fan/2, -1.5])
-        difference() {
-            for (x = [-w_fan/2, w_fan/2]) {
-                for (y = [-w_fan/2, w_fan/2]) {
-                    translate([x, y, 0])
-                    intersection() {
-                        cylinder(d=14, h=3, $fn=20);
+module effector() {
+    ww = cos(a_fan)*w_fan + 2;
+
+    difference() {
+        union() {
+            difference() {
+                union() {
+                    translate([-w_fan/2, -17.5, 0])
+                        cube([w_fan, 35, 21 + 4.45 + 4.5 + 4.75]);
+
+                    for (a = [0, 120, 240]) {
+                        rotate([0, 0, a])
+                        union() {
+                            translate([0, ww/2 + (sqrt(3)/2*w_fan)/3, (21 + 4.45 + 4.5 + 4.75)/2])
+                                cube([w_fan, ww, 21 + 4.45 + 4.5 + 4.75], center=true);
+
+                            translate([-33, ww/2 + (sqrt(3)/2*w_fan)/3 + 4.2, 0])
+                            rotate([-58, 0, 0])
+                                cube([66, 4, 4]);
+
+                                magnet_holder_slice();
+
+                            translate([-0.9, -13, -26.6])
+                            rotate([45, 0, 0])
+                                cube([1.8, 40, 40]);
+                        }
+                    }
+                }
+                
+                for (a = [0, 120, 240]) {
+                    rotate([0, 0, a]) {
+                        union() {
+                            translate([0, ww/2 + (sqrt(3)/2*w_fan)/3, (sin(a_fan)*w_fan)/2-0.5])
+                                cube([w_fan-3.6, 30, sin(a_fan)*w_fan-4], center=true);
+                
+                            translate([0, (sqrt(3)/2*w_fan)/3 + 2 + w_fan/2, 21 + 4.45 + 5])
+                                cube([w_fan + 10, w_fan, 10], center=true);
+                        }
+                    }
+                }
+            
+                rotate([0, 0, 120])
+                translate([0, ww/2 + (sqrt(3)/2*w_fan)/3 - 1, 0])
+                    cube([w_fan-3.6, cos(a_fan)*w_fan - 3, 4], center=true);
+
+                translate([0, (sqrt(3)/2*w_fan)/3 + 1.5, 21 + 4.45 + (4.75 + 4.5)/2])
+                rotate([90, 0, 0])
+                union() {
+                    translate([-11, 0, 0]) {
+                            polyhole(17, 3.3);
+
+                        rotate([0, 0, 30])
+                            m3_nut(width=5.8);
+                    }
+                    
+                    translate([11, 0, 0]) {
+                            polyhole(17, 3.3);
                         
-                        translate([x/(w_fan/2)*-3.5, y/(w_fan/2)*-3.5, 0])
-                            cube([7, 7, 3], center=true);
+                        rotate([0, 0, 30])
+                            m3_nut(width=5.8);
+                    }
+                }
+                
+                translate([-w_fan, -25, 21 + 4.45])
+                    cube([2*w_fan, 30, 30]);
+
+                translate([0, 0, -1])
+                    cylinder(d=16.6, h=60, $fn=80);
+            }
+
+            for (a = [120, 240]) {
+                rotate([0, 0, a])
+                translate([0, ww + (sqrt(3)/2*w_fan)/3, 0])
+                rotate([-a_fan, 0, 0])
+                translate([0, -w_fan/2, -1.5])
+                for (x = [-1, 1]) {
+                    for (y = [-1, 1]) {
+                        translate([x * w_fan/2, y * w_fan/2, -1.5])
+                        intersection() {
+                            cylinder(d=14, h=7, $fn=20);
+                            
+                            translate([x * -3.5, y * -3.5, 0])
+                                cube([7, 7, 6.25], center=true);
+                        }
                     }
                 }
             }
 
+            rotate([0, 0, 120])
+            translate([0, (sqrt(3)/2*w_fan)/3 + 1.8, (sin(a_fan)*w_fan)/2])
+                cube([w_fan-2, 1.8, sin(a_fan)*w_fan], center=true);
+
+        }
+        
+        for (a = [120, 240]) {
+            rotate([0, 0, a])
+            translate([0, ww + (sqrt(3)/2*w_fan)/3, 0])
+            rotate([-a_fan, 0, 0])
+            translate([0, -w_fan/2, -1.5])
             for (p = fan_hole_offsets) {
                 translate([0, 0, 0])
                 translate(p)
-                    cylinder(d=2.5, h=4, $fn=20, center=true);
+                    cylinder(d=2.5, h=10, $fn=20, center=true);
             }
         }
+
+        for (a = [0, 120, 240]) {
+            rotate([0, 0, a]) {
+                translate([0, ww + (sqrt(3)/2*w_fan)/3, 0])
+                rotate([-a_fan, 0, 0])
+                translate([0, -w_fan/2 +2.5, h_fan])
+                    cube([w_fan + 0.2, w_fan + 5, h_fan*2], center=true);
+            }
+        }
+
+        translate([0, 0, -20])
+            cube([100, 100, 40], center=true);
     }
 
-    rotate([0, 0, 120])
-    translate([0, (sqrt(3)/2*w_fan)/3 + 0.5, (cos(a_fan)*w_fan)/2])
-        cube([w_fan-2, 1, cos(a_fan)*w_fan], center=true);
-}
+    difference() {
+        union() {
+            hull() {
+                translate([-(w_fan-3.9)/2, (sqrt(3)/2*w_fan)/3 - 4.5, sin(a_fan)*w_fan - 3.5 - 0.2])
+                    cube([w_fan-3.9, 8, 1]);
+            
+                translate([0, 0, 0.5])
+                    cube([9, 9, 1], center=true);
+            }
 
-*for (a = [0, 120, 240]) {
-    rotate([0, 0, a])
-    union() {
-            magnet_holder_slice();
+            hull() {
+                rotate([0, 0, 120])
+                translate([-(w_fan-3.9)/2, (sqrt(3)/2*w_fan)/3 - 4.5, sin(a_fan)*w_fan - 3.5 - 0.2])
+                    cube([w_fan-3.9, 4.2, 1]);
+
+                translate([0, 0, 0.5])
+                    cube([9, 9, 1], center=true);
+            }
+            
+            hull() {
+                rotate([0, 0, 240])
+                translate([-(w_fan-14)/2, (sqrt(3)/2*w_fan)/3 - 4.3, sin(a_fan)*w_fan - 3.5 - 0.2])
+                    cube([w_fan-14, 8, 1]);
+            
+                translate([0, 0, 0.5])
+                    cube([9, 9, 1], center=true);
+            }
+
+            hull() {
+                rotate([0, 0, 240])
+                translate([-(w_fan-3.9)/2, (sqrt(3)/2*w_fan)/3 - 4.5, sin(a_fan)*w_fan - 3.5 - 0.2])
+                    cube([w_fan-3.9, 4, 1]);
+            
+                translate([0, 0, 0.5])
+                    cube([9, 9, 1], center=true);
+            }
+        }
         
-        mirror([1, 0 ,0])
-            magnet_holder_slice();
+        for (x = [0 : 40]) {
+            translate([-20 + x * 1.25, -25, sin(a_fan)*w_fan - 3.5 - 0.2])
+                cube([1, 50, 5]);
+        }
+        
+        translate([-0.4, -25, -1])
+            cube([0.8, 50, 30]);
+
+        translate([-25, -0.4, -1])
+            cube([50, 0.8, 30]);
     }
 }
 
-#translate([0, 0, (21 + 4.45 + 2.25)])
-rotate([0, 0, 0])
+module hotend_holder() {
+    translate([11, -4.626, 0])
+        cylinder(d=5.3, h=11.75, $fn=10);
+
+    translate([-11, -4.626, 0])
+        cylinder(d=5.3, h=11.75, $fn=10);
+
+    rotate([90, 0, 0])
+    translate([0, 11, 0])
+    difference() {
+        union() {
+            translate([-w_fan/2, -17.5, 0])
+                cube([w_fan, 35, 9.25]);
+
+            translate([0, 0, 9.25])
+            rotate([0, 0, 22.5])
+                cylinder(d1=21, d2=10, h=4, $fn=8);
+        }
+
+        union() {
+            translate([0, 0, 4.3])
+                cylinder(d=16.6, h=4.95, $fn=80);
+
+            translate([-16.6/2, 0, 4.3])            
+                cube([16.6, 5, 4.95]);
+                
+            translate([0, 0, -0.1])
+                cylinder(d=11.92, h=4.65, $fn=80);
+
+            translate([-11.92/2, 0, -0.1])            
+                cube([11.92, 5, 4.65]);
+                
+            translate([0, 4.45 - 3.5, 4.65])
+            rotate([90, 0, 0])
+            union() {
+                translate([-11, 0, 0]) {
+                    translate([0, 0, -8.48])
+                        polyhole(17, 3.3);
+
+                    cylinder(d=5.8, h=10, $fn=20);
+                }
+                
+                translate([11, 0, 0]) {
+                    translate([0, 0, -8.48])
+                        polyhole(17, 3.3);
+                    
+                    cylinder(d=5.8, h=10, $fn=20);
+                }
+            }
+            
+            polyhole(30, 4.2);
+            
+            translate([0, w_fan/2 + 4.45, 0])
+                cube([w_fan + 10, w_fan, 2*9.269], center=true);
+
+            for (a = [120, 240]) {
+                rotate([0, 0, a]) {
+                    union() {
+                        translate([0, (sqrt(3)/2*w_fan)/3 + 2 + w_fan/2, 0])
+                            cube([w_fan + 10, w_fan, 20], center=true);
+                    }
+                }
+            }
+            
+            translate([0, -w_fan/2 - 11, 0])
+                cube([w_fan + 10, w_fan, 20], center=true);
+        }
+    }
+}
+
+module fan_shroud() {
+    y = (sqrt(3)/2*w_fan)/3;
+
+    rotate([0, 0, 120]) {
+        difference() {
+            hull() {
+                translate([0, y + (cos(a_fan)*w_fan)/2 + 0.5, -0.3])
+                    cube([w_fan-1.3, cos(a_fan)*w_fan - 1.2, 0.3], center=true);
+
+                translate([0, y + (cos(a_fan)*w_fan)/2 - 3.5, -15])
+                    cube([w_fan-14, cos(a_fan)*w_fan - 10, 0.1], center=true);
+            }
+
+            hull() {
+                translate([0, y + (cos(a_fan)*w_fan)/2 + 0.5, -0.3])
+                    cube([w_fan-3.2, cos(a_fan)*w_fan - 3, 0.3], center=true);
+
+                translate([0, y + (cos(a_fan)*w_fan)/2 - 4, -16])
+                    cube([w_fan-17, cos(a_fan)*w_fan - 13, 0.1], center=true);
+            }
+        
+            translate([0, y + (cos(a_fan)*w_fan)/2 + 0.5, -0.3])
+                cube([w_fan-3.5, cos(a_fan)*w_fan - 3.5, 1], center=true);
+
+            translate([0, y + (cos(a_fan)*w_fan)/2 + 3.5, 0])
+            rotate([-25, 0, 0])
+            translate([0, 0, -17])
+                cube([w_fan, cos(a_fan)*w_fan, 3], center=true);
+        }
+    }
+}
+
+effector();
+
+*hotend_holder();
+
+*rotate([180, 0, 0])
+fan_shroud();
+
+*translate([0, 0, (21 + 4.45 + 2.25)])
+rotate([0, 0, 30])
     hotend();
 
 *for (a = [120, 240]) {
     rotate([0, 0, a])
     translate([0, ww + (sqrt(3)/2*w_fan)/3, 0])
-    rotate([-45, 0, 0])
+    rotate([-a_fan, 0, 0])
     translate([0, -w_fan/2, 0])
         30mm_fan();
 }
