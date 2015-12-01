@@ -273,8 +273,8 @@ module fan_shroud() {
                     hull() {
                         cylinder(d=w, h=0.1, $fn=80);
                         
-                        translate([12.5, 0, 35 + 0.1])
-                            cube([5, w, 0.1], center=true);
+                        translate([10, 0, 38 + 0.1])
+                            cube([10, w, 0.1], center=true);
                     }
                     
                     for (x=[p, -p]) {
@@ -320,8 +320,8 @@ module fan_shroud() {
                 hull() {
                     cylinder(d=w-2*wt, h=0.1, $fn=80);
                     
-                    translate([12.5, 0, 35 + 0.1])
-                        cube([5-2*wt, w-2*wt, 0.1], center=true);
+                    translate([10, 0, 38 + 0.1])
+                        cube([10-2*wt, w-2*wt, 0.2], center=true);
                 }
 
                 translate([12.5, 0, 35 + 0.1])
@@ -348,12 +348,17 @@ module fan_shroud() {
                     cylinder(d=2.3, h=10, $fn=20);
             }
         }
+        
+        translate([14, 0, 38 + 0.1])
+        rotate([0, -40, 0])
+        translate([-25, -25, 0])
+            cube([50, 50, 20]);
     }
 }
 
 
 
-effector();
+*effector();
 
 *translate([0, 0, 33])
      hotend_holder();
@@ -365,13 +370,15 @@ effector();
 rotate([90, 0, 0])
     #fan(30, 10);
 
-*for (a=[120, 240])
+/*
+for (a=[120, 240])
 rotate([0, 0, a])
 translate([0, -27, 12.5])
 rotate([0, 0, 90])
 rotate([0, -40, 0])
 rotate([180, 0, 0])
 translate([-20, 0, -3.5])
+// */
     fan_shroud();
 
 
