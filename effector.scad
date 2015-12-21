@@ -1,4 +1,5 @@
 include <m3.scad>
+use <layer_fan.scad>
 
 play             = 0.3;
 d_magnet         = 15 + 3 + play; // outer diameter of magnet
@@ -259,126 +260,21 @@ module hotend_holder() {
     }
 }
 
-module fan_shroud() {
-    w = 30;
-    h = 2;
-    wt = 1;
+rotate([0, 0, 180])
+effector();
 
-    p = w / 2 - 3;
-
-    difference() {
-        union() {
-            difference() {
-                union() {
-                    hull() {
-                        cylinder(d=w, h=0.1, $fn=80);
-                        
-                        translate([10, 0, 38 + 0.1])
-                            cube([10, w, 0.1], center=true);
-                    }
-                    
-                    for (x=[p, -p]) {
-                        for (y=[p, -p]) {
-                            hull() {
-                                union() {
-                                    cylinder(d=6, h=10, $fn=20);
-                                    
-                                    translate([0, 0, 10])
-                                        sphere(d=6, $fn=20);
-                                }
-                            
-                                translate([x, y, 0])
-                                union() {
-                                    cylinder(d=5, h=10, $fn=20);
-                                    
-                                    translate([0, 0, 10])
-                                        sphere(d=5, $fn=20);
-                                }
-                            }
-                        }
-                    }
-                    
-                    for (y = [3, -3]) {
-                        translate([12, y, 3.5])
-                            cube([24, 3, 7], center=true);
-                    }
-                }
-
-                translate([20, 0, 3.5])
-                rotate([90, 0, 0])
-                union() {
-                    cylinder(d=3.3, h=10, center=true, $fn=20);
-
-                    translate([0, 0, -5])
-                        cylinder(d=5.8, h=3, center=true, $fn=20);
-
-                    translate([0, 0, 5])
-                    rotate([0, 0, 30])
-                        m3_nut();
-                }
-
-                hull() {
-                    cylinder(d=w-2*wt, h=0.1, $fn=80);
-                    
-                    translate([10, 0, 38 + 0.1])
-                        cube([10-2*wt, w-2*wt, 0.2], center=true);
-                }
-
-                translate([12.5, 0, 35 + 0.1])
-                    cube([5-2*wt, w - 2*wt, 0.2], center=true);
-
-                translate([0, 0, -0.1])
-                    cylinder(d=w-2*wt, h=0.2, $fn=80);
-            }
-            
-            for (y=[p, -p]) {
-                translate([p, y, 0])
-                union() {
-                    cylinder(d=5, h=10, $fn=20);
-                    
-                    translate([0, 0, 10])
-                        sphere(d=5, $fn=20);
-                }
-            }
-        }
-        
-        for (x = [-p, p]) {
-            for (y = [-p ,p]) {
-                translate([x, y, -0.1])
-                    cylinder(d=2.3, h=10, $fn=20);
-            }
-        }
-        
-        translate([14, 0, 38 + 0.1])
-        rotate([0, -40, 0])
-        translate([-25, -25, 0])
-            cube([50, 50, 20]);
-    }
-}
-
-
-
-*effector();
-
-*translate([0, 0, 33])
+translate([0, 0, 33])
+rotate([0, 0, 180])
      hotend_holder();
 
-*rotate([0, 0, 90])
+rotate([0, 0, 180])
+rotate([0, 0, 90])
     #e3d_lite();
 
 *translate([0, -15, 15 + 2])
 rotate([90, 0, 0])
     #fan(30, 10);
 
-/*
-for (a=[120, 240])
-rotate([0, 0, a])
-translate([0, -27, 12.5])
-rotate([0, 0, 90])
-rotate([0, -40, 0])
-rotate([180, 0, 0])
-translate([-20, 0, -3.5])
-// */
-    fan_shroud();
-
-
+translate([0, 0, -7])
+translate([0, 0, -10])
+    layer_fan();
