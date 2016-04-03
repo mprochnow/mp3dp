@@ -25,8 +25,10 @@ module outer_tube() {
     rotate_extrude($fn=tube_resolution) {
         translate([tube_dia / 2 + tube_id / 2,0,0])
         rotate([180,0,180])
-            duct_outline(tube_dia);        
+            duct_outline(tube_dia);
     }
+    
+    cylinder(d=tube_od-10, h=wall_thickness/2+0.1, $fn=tube_resolution);
 }
 
 module inner_tube() {
@@ -49,7 +51,7 @@ module slit() {
 
 module cable_cut_out() {
     rotate([0, 0, 150])
-    translate([tube_od/2, 0, 7])
+    translate([tube_od/2, 0, wall_thickness+7])
         cube([tube_od, 15, 15], center=true);
 }
 
@@ -58,6 +60,7 @@ module tube_end_caps() {
         difference() {
             outer_tube();
             cable_cut_out();
+            cylinder(d=10, h=2*wall_thickness, $fn=20, center=true);
         }
     
         rotate([0, 0, 150])
@@ -72,8 +75,8 @@ module holder(height=33) {
         difference() {
             for (y=[3.4, -3.4]) {
                 translate([15 + 12, y, 0])
-                translate([0, 0, height/2+1])
-                    cube([7, 3.6, height], center=true);
+                translate([-3.7, -1.8, 1])
+                    cube([7.4, 3.6, height]);
             }
             
             outer_tube();
@@ -88,15 +91,15 @@ module holder(height=33) {
 
                 translate([0, 0, (a==210) ? 5 : -5])
                 rotate([0, 0, 30])
-                    m3_nut();
+                    m3_nut(width=5.8);
             }
         }
     }
 }
 
 module fan_mount() {
-    w = 15.5 + 2 * wall_thickness;
-    d = 20.1 + 2 * wall_thickness;
+    w = 19.6 + 2 * wall_thickness;
+    d = 31 + 2 * wall_thickness;
     h = 18 + tube_dia;
     t = wall_thickness;
     
@@ -104,11 +107,11 @@ module fan_mount() {
     difference() {
         translate([(tube_id)/2+tube_dia+0.9, 0, 0])
         union() {
-            translate([d/2, 0, (h-tube_dia/2)/2+tube_dia/2])
-                cube([d, w, h-tube_dia/2], center=true);
+            translate([0, -w/2, tube_dia/2])
+                cube([d, w, h-tube_dia/2]);
             
-            translate([(d-tube_dia)/2, 0, (tube_dia/2)/2])
-                cube([d, w, tube_dia/2], center=true);
+            translate([-tube_dia/2, -w/2, 0])
+                cube([d, w, tube_dia/2]);
 
             translate([d-tube_dia/2, 0, tube_dia/2])
             rotate([0, 45, 0])
@@ -119,36 +122,36 @@ module fan_mount() {
 }
 
 module fan_mount_cutout() {
-    w = 15.5 + 2 * wall_thickness;
-    d = 20.2 + 2 * wall_thickness;
+    w = 19.6 + 2 * wall_thickness;
+    d = 31 + 2 * wall_thickness;
     h = 18 + tube_dia;
     t = wall_thickness;
     
     rotate([0, 0, 330])
     translate([(tube_id)/2+tube_dia+0.9, 0, 0])
     union() {
-        translate([d/2, 0,(h-tube_dia/2)/2+tube_dia/2])
-            cube([d-4*t, w-4*t, h-tube_dia/2], center=true);
+        translate([t, -(w-4*t)/2, tube_dia/2-t])
+            cube([d-3*t, w-4*t, h-tube_dia/2]);
 
-        translate([(d-tube_dia/2)/2, 0, (tube_dia/2)/2+2*t])
-            cube([d-tube_dia/2, w-4*t, tube_dia/2], center=true);
+        translate([-tube_dia/2-0.1, -(w-4*t)/2, t])
+            cube([d+tube_dia/2-5*t+0.3, w-4*t, tube_dia/2+t]);
 
-        translate([d-tube_dia/2, 0, tube_dia/2])
+        translate([d-tube_dia/2, 0, tube_dia/2-t])
         rotate([0, 45, 0])
         rotate([0, 0, 90])
             cube([w-4*t, cos(45)*(tube_dia-4*t), cos(45)*(tube_dia-4*t)], center=true);
 
-        translate([d/2, 0, h/2+t+14])
+        translate([d/2, 0, h/2+t+10])
             cube([d-2*t, w-2*t, h], center=true);
         
         translate([t, 0, h])
-        rotate([0, 30, 0])
-        translate([(d+10)/2, 0, h/2])
-            cube([(d+10), w+1, h], center=true);
+        rotate([0, 28, 0])
+        translate([(d+10.11)/2-2, 0, h/2-0.5])
+            cube([(d+8), w+1, h], center=true);
         
-        translate([0, 0, t+14])
-        translate([0, 0, 12/2])
-            cube([10, 2.6, 12], center=true);
+        translate([0, 0, t+10+5.3])
+        translate([0, 0, 7.5/2])
+            cube([10, 2.6, 7.5], center=true);
     }
 }
 
@@ -164,6 +167,7 @@ module layer_fan() {
             slit();
             cable_cut_out();
             fan_mount_cutout();
+            cylinder(d=10, h=2*wall_thickness, $fn=20, center=true);
         }
         tube_end_caps();
     }
