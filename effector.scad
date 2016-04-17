@@ -17,6 +17,11 @@ tube_dia = (tube_od - tube_id) / 3;
 tube_resolution = 256;
 tube_height = 14.7+2; //11.5+2;
 tube_opening_width = 3;
+
+layer_fan_offset = 24; // offset of layer fan from center
+layer_fan_width = 19.6;
+layer_fan_depth = 31;
+
 /*
     Calculation of magnet position
 */
@@ -82,7 +87,25 @@ module e3d_lite() {
     }
 }
 
-module magnet_holder_slice() {
+module fan(w, h, o=3) {
+    p = w / 2 - o;
+
+    translate([0, 0, h/2])
+    difference() {
+        cube([w, w, h], center=true);
+
+        cylinder(d=w-2, h=h+1, center=true, $fn=80);
+        
+        for (x = [-p, p]) {
+            for (y = [-p ,p]) {
+                translate([x, y, 0])
+                    cylinder(d=3.1, h=h+1, center=true, $fn=20);
+            }
+        }
+    }
+}
+
+module magnet_holder_slice(outer_only=false, inner_only=false) {
     difference() {
         for(a=[0, 120, 240]) {
             translate([0, 0, 14.7])     
@@ -132,9 +155,10 @@ module outer_tube() {
                     duct_outline(w, h);
             }
 
+            // radial fan mount
             rotate([0, 0, 330])
-            translate([tube_id/2, -(19.6+2*t)/2, 0])
-                cube([31+2*t, 19.6+2*t, tube_height]);
+            translate([layer_fan_offset, -(19.6+2*t)/2, 0])
+                cube([layer_fan_depth+2*t, layer_fan_width+2*t, tube_height+15+1.6]);
             
             cylinder(d=tube_id+2, h=t, $fn=tube_resolution);
         }
@@ -154,9 +178,22 @@ module inner_tube() {
                 duct_outline(w, h);
         }
 
-        rotate([0, 0, 330])
-        translate([tube_id/2+t, -19.6/2, 0])
-            cube([31, 19.6, tube_height]);
+        // radial fan mount
+        rotate([0, 0, 330]) {
+            translate([layer_fan_offset+2*t, -(layer_fan_width-2*t)/2, 0])
+                cube([layer_fan_depth-2*t, layer_fan_width-2*t, tube_height+15]);
+
+            translate([layer_fan_offset+t, -(layer_fan_width)/2, tube_height])
+                cube([layer_fan_depth, layer_fan_width, 15+1.6+0.1]);
+
+            translate([layer_fan_offset-0.05, -1, tube_height+5.3])
+                cube([t+0.1, 2, 7.5]);
+
+            translate([layer_fan_offset+layer_fan_depth+2*t+0.1, 0, tube_height+1.6])
+            rotate([0, atan((15-1.6)/(layer_fan_depth+2*t)), 0])
+            translate([-2*layer_fan_depth, -(layer_fan_width+2*t+1)/2, 0])
+                cube([2*layer_fan_depth, layer_fan_width+2*t+1, 15]);
+        }
     }
 
     difference() {
@@ -178,4 +215,11 @@ difference() {
     outer_tube();
     inner_tube();
 }
+
 *#e3d_lite();
+
+*rotate([0, 0, 180])
+translate([0, 15, 14.7 + 2 + 15])
+translate([0, 10, 0])
+rotate([90, 0, 0])
+    #fan(30, 10);
