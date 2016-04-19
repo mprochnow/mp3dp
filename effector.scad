@@ -22,6 +22,11 @@ layer_fan_offset = 24; // offset of layer fan from center
 layer_fan_width = 19.6;
 layer_fan_depth = 31;
 
+layer_fan_mount_hole_x = 37.8;
+layer_fan_mount_hole_y = 2.7;
+layer_fan_mount_width = 13;
+layer_fan_mount_diameter = 7;
+
 /*
     Calculation of magnet position
 */
@@ -141,6 +146,24 @@ module duct_outline(w, h) {
     
 }
 
+module layer_fan_lower_mount() {
+    t = wall_thickness;
+    r = layer_fan_mount_diameter / 2;
+    a = layer_fan_mount_hole_x - layer_fan_depth;
+    b = layer_fan_mount_hole_y;
+    c = sqrt(pow(a, 2) + pow(b, 2));
+    m = atan(b / a) + asin(r / c);
+    l = sqrt(pow(c , 2) - pow(r, 2));
+    
+    rotate([0, -m, 0])
+    translate([-0.25*l, 0, -r])
+        cube([2.5*l, layer_fan_width+2*t, 2*r], center=true);
+    
+    translate([a, (layer_fan_width+2*t)/2+t, b])
+    rotate([90, 0, 0])
+        cylinder(r=r, h=layer_fan_width+2*t+t, $fn=40);
+}
+
 module outer_tube() {
     t = wall_thickness;
     w = tube_od/2 - tube_id/2;
@@ -156,9 +179,13 @@ module outer_tube() {
             }
 
             // radial fan mount
-            rotate([0, 0, 330])
-            translate([layer_fan_offset, -(19.6+2*t)/2, 0])
-                cube([layer_fan_depth+2*t, layer_fan_width+2*t, tube_height+15+1.6]);
+            rotate([0, 0, 330]) {
+                translate([layer_fan_offset, -(19.6+2*t)/2, 0])
+                    cube([layer_fan_depth+2*t, layer_fan_width+2*t, tube_height+15+1.6]);
+
+                    translate([layer_fan_offset+t+layer_fan_depth, 0, tube_height+1.6])
+                        layer_fan_lower_mount();
+            }
             
             cylinder(d=tube_id+2, h=t, $fn=tube_resolution);
         }
