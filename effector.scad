@@ -25,7 +25,7 @@ layer_fan_depth = 31;
 layer_fan_mount_hole_x = 37.8;
 layer_fan_mount_hole_y = 2.7;
 layer_fan_mount_width = 13;
-layer_fan_mount_diameter = 7;
+layer_fan_mount_diameter = 8;
 
 /*
     Calculation of magnet position
@@ -155,13 +155,36 @@ module layer_fan_lower_mount() {
     m = atan(b / a) + asin(r / c);
     l = sqrt(pow(c , 2) - pow(r, 2));
     
-    rotate([0, -m, 0])
-    translate([-0.25*l, 0, -r])
-        cube([2.5*l, layer_fan_width+2*t, 2*r], center=true);
-    
-    translate([a, (layer_fan_width+2*t)/2+t, b])
-    rotate([90, 0, 0])
-        cylinder(r=r, h=layer_fan_width+2*t+t, $fn=40);
+    difference() {
+        union() {
+            rotate([0, -m, 0])
+            translate([-0.5*l, 0, -r])
+                cube([3*l, layer_fan_width+2*t, 2*r], center=true);
+            
+            translate([a, (layer_fan_width+2*t)/2+t, b])
+            rotate([90, 0, 0])
+                cylinder(r=r, h=layer_fan_width+2*t+t, $fn=40);
+        }
+        
+        // screw hole
+        translate([a, (layer_fan_width+2*t+0.1)/2+t, b])
+        rotate([90, 0, 0])
+            cylinder(d=3.3, h=layer_fan_width+2*t+t+0.1, $fn=20);
+
+        // screw head
+        translate([a, -(layer_fan_width+2*t)/2+3, b])
+        rotate([90, 0, 0])
+            cylinder(d=5.8, h=3.1, $fn=20);
+        
+        // nut trap
+        translate([a, (layer_fan_width+2*t)/2+2.4, b])
+        rotate([90, 30, 0])
+            cylinder(d=5.8/sin(60), h=2.4, $fn=6);
+        
+        // cutout for fan mount
+        translate([(a+r+0.1)/2, (layer_fan_width-layer_fan_mount_width)/2, 0])
+            cube([a+r+0.1, layer_fan_mount_width, tube_height+15], center=true);
+    }
 }
 
 module outer_tube() {
