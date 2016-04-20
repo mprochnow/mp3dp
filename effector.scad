@@ -181,9 +181,9 @@ module outer_tube() {
             // radial fan mount
             rotate([0, 0, 330]) {
                 translate([layer_fan_offset, -(19.6+2*t)/2, 0])
-                    cube([layer_fan_depth+2*t, layer_fan_width+2*t, tube_height+15+1.6]);
+                    cube([layer_fan_depth+2*t, layer_fan_width+2*t, h+15+1.6]);
 
-                    translate([layer_fan_offset+t+layer_fan_depth, 0, tube_height+1.6])
+                    translate([layer_fan_offset+2*t+layer_fan_depth, 0, h+1.6])
                         layer_fan_lower_mount();
             }
             
@@ -199,28 +199,10 @@ module inner_tube() {
     w = tube_od/2 - tube_id/2 - t - 2*t;
     h = tube_height - 2 * t;
     
-    translate([0, 0, t]) {
-        rotate_extrude($fn=tube_resolution) {
-            translate([tube_id/2+w/2+2*t,0,0])
-                duct_outline(w, h);
-        }
-
-        // radial fan mount
-        rotate([0, 0, 330]) {
-            translate([layer_fan_offset+2*t, -(layer_fan_width-2*t)/2, 0])
-                cube([layer_fan_depth-2*t, layer_fan_width-2*t, tube_height+15]);
-
-            translate([layer_fan_offset+t, -(layer_fan_width)/2, tube_height])
-                cube([layer_fan_depth, layer_fan_width, 15+1.6+0.1]);
-
-            translate([layer_fan_offset-0.05, -1, tube_height+5.3])
-                cube([t+0.1, 2, 7.5]);
-
-            translate([layer_fan_offset+layer_fan_depth+2*t+0.1, 0, tube_height+1.6])
-            rotate([0, atan((15-1.6)/(layer_fan_depth+2*t)), 0])
-            translate([-2*layer_fan_depth, -(layer_fan_width+2*t+1)/2, 0])
-                cube([2*layer_fan_depth, layer_fan_width+2*t+1, 15]);
-        }
+    translate([0, 0, t])
+    rotate_extrude($fn=tube_resolution) {
+        translate([tube_id/2+w/2+2*t, 0, 0])
+            duct_outline(w, h);
     }
 
     difference() {
@@ -236,6 +218,22 @@ module inner_tube() {
                 cube([2*wall_thickness, tube_od, tube_opening_width*2]);
     }
 
+    // radial fan mount
+    rotate([0, 0, 330]) {
+        translate([layer_fan_offset+2*t, -(layer_fan_width-2*t)/2, t])
+            cube([layer_fan_depth-2*t, layer_fan_width-2*t, tube_height+15]);
+
+        translate([layer_fan_offset+t, -(layer_fan_width)/2, tube_height])
+            cube([layer_fan_depth, layer_fan_width, 15+1.6+0.1]);
+
+        translate([layer_fan_offset-0.05, -1, tube_height+5.3])
+            cube([t+0.1, 2, 7.5]);
+
+        translate([layer_fan_offset+layer_fan_depth+2*t, 0, tube_height+1.6])
+        rotate([0, atan((15-1.6)/(layer_fan_depth+2*t)), 0])
+        translate([-2*layer_fan_depth, -(layer_fan_width+2*t+1)/2, 0])
+            cube([2*layer_fan_depth, layer_fan_width+2*t+1, 15]);
+    }
 }
 
 difference() {
