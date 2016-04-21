@@ -11,7 +11,7 @@ h_magnet         = 4; // height of magnet
 distance_magnets = 60;
 a_magnet_mount   = -30;
 
-tube_od = 88;
+tube_od = 85.9;
 tube_id = 33; //inner ring diameter adjust for clearance around the hotend
 tube_dia = (tube_od - tube_id) / 3;
 tube_resolution = 256;
@@ -19,8 +19,8 @@ tube_height = 14.7+2; //11.5+2;
 tube_opening_width = 3;
 
 layer_fan_offset = 24; // offset of layer fan from center
-layer_fan_width = 19.6;
-layer_fan_depth = 31;
+layer_fan_width = 19.5 + play;
+layer_fan_depth = 30;
 
 layer_fan_mount_hole_x = 37.8;
 layer_fan_mount_hole_y = 2.7;
@@ -112,19 +112,30 @@ module fan(w, h, o=3) {
 
 module magnet_holder_slice(outer_only=false, inner_only=false) {
     difference() {
-        for(a=[0, 120, 240]) {
-            translate([0, 0, 14.7])     
-            rotate([0, 0, a]){
-                for(i=[-1, 1]) {
-                    translate([0, magnet_y, magnet_h])
-                    rotate([a_magnet_mount, 0, 0])
-                    translate([i*magnet_x, 0, 0])
-                    difference() {
-                        translate([0, 0, -20])
-                            cylinder(r=r_magnet+1.5, h=20+h_magnet + 2, $fn=80);
+        translate([0, 0, 15.1])
+        difference() {
+            for(a=[0, 120, 240]) {
+                union() {
+                    rotate([0, 0, a]){
+                        for(i=[-1, 1]) {
+                            translate([0, magnet_y, magnet_h])
+                            rotate([a_magnet_mount, 0, 0])
+                            translate([i*magnet_x, 0, -20])
+                                cylinder(r=r_magnet+0.8, h=20+h_magnet, $fn=80);
+                        }
+                    }
+                }
+            }
 
-                        translate([0, 0, +2])
-                            cylinder(d=d_magnet, h=h_magnet+0.1, $fn=80);
+            for(a=[0, 120, 240]) {
+                union() {
+                    rotate([0, 0, a]){
+                        for(i=[-1, 1]) {
+                            translate([0, magnet_y, magnet_h])
+                            rotate([a_magnet_mount, 0, 0])
+                            translate([i*magnet_x, 0, 0])
+                                cylinder(d=d_magnet, h=h_magnet+0.1, $fn=80);
+                        }
                     }
                 }
             }
@@ -203,7 +214,7 @@ module outer_tube() {
 
             // radial fan mount
             rotate([0, 0, 330]) {
-                translate([layer_fan_offset, -(19.6+2*t)/2, 0])
+                translate([layer_fan_offset, -(layer_fan_width+2*t)/2, 0])
                     cube([layer_fan_depth+2*t, layer_fan_width+2*t, h+15+1.6]);
 
                     translate([layer_fan_offset+2*t+layer_fan_depth, 0, h+1.6])
@@ -259,15 +270,17 @@ module inner_tube() {
     }
 }
 
+
 difference() {
     outer_tube();
     inner_tube();
 }
 
-*#e3d_lite();
+*rotate([0, 0, -120])
+    #e3d_lite();
 
-*rotate([0, 0, 180])
-translate([0, 15, 14.7 + 2 + 15])
+*rotate([0, 0, 120])
+translate([0, 15, tube_height+15])
 translate([0, 10, 0])
 rotate([90, 0, 0])
-    #fan(30, 10);
+    fan(30, 10);
