@@ -1,6 +1,3 @@
-include <m3.scad>
-use <layer_fan.scad>
-
 nozzle_width = 0.4;
 wall_thickness = 2 * nozzle_width;
 
@@ -24,7 +21,7 @@ layer_fan_depth = 30;
 
 layer_fan_mount_hole_x = 37.8;
 layer_fan_mount_hole_y = 2.7;
-layer_fan_mount_width = 13;
+layer_fan_mount_width = 13.5;
 layer_fan_mount_diameter = 8;
 
 /*
@@ -160,11 +157,11 @@ module duct_outline(w, h) {
 module layer_fan_lower_mount() {
     t = wall_thickness;
     r = layer_fan_mount_diameter / 2;
-    a = layer_fan_mount_hole_x - layer_fan_depth;
+    a = layer_fan_mount_hole_x - layer_fan_depth - t;
     b = layer_fan_mount_hole_y;
     c = sqrt(pow(a, 2) + pow(b, 2));
-    m = atan(b / a) + asin(r / c);
     l = sqrt(pow(c , 2) - pow(r, 2));
+    m = atan(b / a) + asin(r / c);
     
     difference() {
         union() {
@@ -215,10 +212,10 @@ module outer_tube() {
             // radial fan mount
             rotate([0, 0, 330]) {
                 translate([layer_fan_offset, -(layer_fan_width+2*t)/2, 0])
-                    cube([layer_fan_depth+2*t, layer_fan_width+2*t, h+15+1.6]);
+                    cube([t+layer_fan_depth+t, layer_fan_width+2*t, h+15]);
 
-                    translate([layer_fan_offset+2*t+layer_fan_depth, 0, h+1.6])
-                        layer_fan_lower_mount();
+                translate([layer_fan_offset+t+layer_fan_depth+t, 0, h])
+                    layer_fan_lower_mount();
             }
             
             cylinder(d=tube_id+2, h=t, $fn=tube_resolution);
@@ -258,13 +255,13 @@ module inner_tube() {
             cube([layer_fan_depth-2*t, layer_fan_width-2*t, tube_height+15]);
 
         translate([layer_fan_offset+t, -(layer_fan_width)/2, tube_height])
-            cube([layer_fan_depth, layer_fan_width, 15+1.6+0.1]);
+            cube([layer_fan_depth, layer_fan_width, 15+0.1]);
 
         translate([layer_fan_offset-0.05, -1, tube_height+5.3])
             cube([t+0.1, 2, 7.5]);
 
-        translate([layer_fan_offset+layer_fan_depth+2*t, 0, tube_height+1.6])
-        rotate([0, atan((15-1.6)/(layer_fan_depth+2*t)), 0])
+        translate([layer_fan_offset+layer_fan_depth+2*t, 0, tube_height])
+        rotate([0, atan(15/(layer_fan_depth+2*t)), 0])
         translate([-2*layer_fan_depth, -(layer_fan_width+2*t+1)/2, 0])
             cube([2*layer_fan_depth, layer_fan_width+2*t+1, 15]);
     }
