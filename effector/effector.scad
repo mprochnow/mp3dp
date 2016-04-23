@@ -85,7 +85,7 @@ module layer_fan_lower_mount() {
         
         // cutout for fan mount
         translate([(a+r+0.1)/2, (layer_fan_width-layer_fan_mount_width)/2, 0])
-            cube([a+r+0.1, layer_fan_mount_width, tube_height+15], center=true);
+            cube([a+r+0.1, layer_fan_mount_width, tube_height+layer_fan_mount_height], center=true);
     }
 }
 
@@ -106,7 +106,7 @@ module outer_tube() {
             // radial fan mount
             rotate([0, 0, 330]) {
                 translate([layer_fan_offset, -(layer_fan_width+2*t)/2, 0])
-                    cube([t+layer_fan_depth+t, layer_fan_width+2*t, h+15]);
+                    cube([t+layer_fan_depth+t, layer_fan_width+2*t, h+layer_fan_mount_height]);
 
                 translate([layer_fan_offset+t+layer_fan_depth+t, 0, h])
                     layer_fan_lower_mount();
@@ -146,26 +146,92 @@ module inner_tube() {
     // radial fan mount
     rotate([0, 0, 330]) {
         translate([layer_fan_offset+2*t, -(layer_fan_width-2*t)/2, t])
-            cube([layer_fan_depth-2*t, layer_fan_width-2*t, tube_height+15]);
+            cube([layer_fan_depth-2*t, layer_fan_width-2*t, tube_height+layer_fan_mount_height]);
 
         translate([layer_fan_offset+t, -(layer_fan_width)/2, tube_height])
-            cube([layer_fan_depth, layer_fan_width, 15+0.1]);
+            cube([layer_fan_depth, layer_fan_width, layer_fan_mount_height+0.1]);
 
         translate([layer_fan_offset-0.05, -1, tube_height+5.3])
             cube([t+0.1, 2, 7.5]);
 
         translate([layer_fan_offset+layer_fan_depth+2*t, 0, tube_height])
-        rotate([0, atan(15/(layer_fan_depth+2*t)), 0])
+        rotate([0, atan(layer_fan_mount_height/(layer_fan_depth+2*t)), 0])
         translate([-2*layer_fan_depth, -(layer_fan_width+2*t+1)/2, 0])
-            cube([2*layer_fan_depth, layer_fan_width+2*t+1, 15]);
+            cube([2*layer_fan_depth, layer_fan_width+2*t+1, layer_fan_mount_height]);
     }
 }
 
+module hotend_mount() {
+    t = wall_thickness;
+    d = hotend_mount_od/2;
+    h = 33;
+    b = hotend_mount_od/2 * sin(30);
+    c = hotend_mount_od/2 * sin(60);
+    e = sqrt(pow((tube_od-(tube_od/2-tube_id/2)/3)/2, 2) - pow(c, 2)) - b;
+    
+    translate([0, 0, tube_height])
+    difference() {
+        union() {
+            cylinder(d=hotend_mount_od, h=h, $fn=128);
+            
+            for (a=[0, 120]) {
+                rotate([0, 0, a]) {
+                    intersection() {
+                        translate([-c, 0, 0])
+                            cube([c*2, tube_od, 2]);
+                    
+                        cylinder(d=tube_od-(tube_od/2-tube_id/2)/3, h=2, $fn=128);
+                    }
+                    
+                    for(x=[-c+t, c-t]) {
+                        translate([x, b, 2])
+                        difference() {
+                            translate([-(2*t)/2, 0, 0])
+                                cube([2*t, e, h-2]);
+                            
+                            translate([-(2*t+0.1)/2, e, 0])
+                            rotate([atan(e/(h-2)), 0, 0])
+                                cube([2*t+0.1, e, sqrt(pow(tube_od/2, 2)+pow(h-2, 2))]);
+                        }
+                    }
+                }
+            }
+            
+            rotate([0, 0, 240])
+            translate([-(layer_fan_width+2*t)/2, 0, 0])
+                cube([layer_fan_width+2*t, hotend_mount_od/2, layer_fan_mount_height]);
+        }
+        
+        union() {
+            for (a=[0, 120]) {
+                rotate([0, 0, a]) {
+                    translate([0, 20, 15 + 1])
+                    rotate([90, 0, 0])
+                        cylinder(d=27, h=20, $fn=80);
+                    
+                    translate([-27/2, 0, 2])
+                        cube([27, 27, 15]);
+                }
+            }
+
+            translate([0, 0, -1])
+                cylinder(d=16.3, h=45, $fn=80);
+
+            translate([0, 0, -1])
+                cylinder(d=23, h=31, $fn=80);
+
+            translate([0, 0, 2])
+                cylinder(d=27, h=28, $fn=80);
+        }
+    }
+}
 
 difference() {
     outer_tube();
     inner_tube();
 }
+
+hotend_mount();
 
 *rotate([0, 0, -120])
     #e3d_lite();
@@ -175,3 +241,4 @@ translate([0, 15, tube_height+15])
 translate([0, 10, 0])
 rotate([90, 0, 0])
     fan(30, 10);
+

@@ -15,7 +15,9 @@ tube_resolution = 256;
 tube_height = 14.7+2; //11.5+2;
 tube_opening_width = 3;
 
-layer_fan_offset = 24; // offset of layer fan from center
+hotend_mount_od = 35;
+
+layer_fan_offset = hotend_mount_od/2+0.2; // offset of layer fan from center
 layer_fan_width = 19.5 + play;
 layer_fan_depth = 30;
 
@@ -23,6 +25,7 @@ layer_fan_mount_hole_x = 37.8;
 layer_fan_mount_hole_y = 2.7;
 layer_fan_mount_width = 13.5;
 layer_fan_mount_diameter = 8;
+layer_fan_mount_height = 15;
 
 /*
     Calculation of magnet position
