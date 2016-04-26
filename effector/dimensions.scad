@@ -12,10 +12,14 @@ tube_od = 85.9;
 tube_id = 33; //inner ring diameter adjust for clearance around the hotend
 tube_dia = (tube_od - tube_id) / 3;
 tube_resolution = 256;
-tube_height = 14.7+2; //11.5+2;
+tube_height = 16.7;
 tube_opening_width = 3;
 
-hotend_mount_od = 35;
+fan_diameter = 30;
+
+support_height = 2 * wall_thickness;
+support_width = fan_diameter + play + 4 * wall_thickness;
+hotend_mount_od = 2 * 0.5 * support_width / cos(30); //35;
 
 layer_fan_offset = hotend_mount_od/2+0.2; // offset of layer fan from center
 layer_fan_width = 19.5 + play;

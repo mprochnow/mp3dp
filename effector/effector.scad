@@ -163,35 +163,40 @@ module inner_tube() {
 
 module hotend_mount() {
     t = wall_thickness;
-    d = hotend_mount_od/2;
+    r = hotend_mount_od/2;
     h = 33;
-    b = hotend_mount_od/2 * sin(30);
-    c = hotend_mount_od/2 * sin(60);
-    e = sqrt(pow((tube_od-(tube_od/2-tube_id/2)/3)/2, 2) - pow(c, 2)) - b;
+    
+    sh = support_height;
+    sw = support_width;
+    sd = tube_od-((tube_od-tube_id)/2)/3 - 0.2;
+
+    e = sqrt(pow(sd, 2) - pow(sw, 2))/2 - r;
     
     translate([0, 0, tube_height])
     difference() {
         union() {
-            cylinder(d=hotend_mount_od, h=h, $fn=128);
-            
+            cylinder(d=hotend_mount_od, h=h, $fn=80);
+
             for (a=[0, 120]) {
                 rotate([0, 0, a]) {
                     intersection() {
-                        translate([-c, 0, 0])
-                            cube([c*2, tube_od, 2]);
-                    
-                        cylinder(d=tube_od-(tube_od/2-tube_id/2)/3, h=2, $fn=128);
+                        translate([-sw/2, 0, 0])
+                            cube([sw, sd, sh]);
+                        
+                        cylinder(d=sd, h=h, $fn=tube_resolution);
                     }
                     
-                    for(x=[-c+t, c-t]) {
-                        translate([x, b, 2])
+                    translate([-sw/2, 0, 0])
+                        cube([sw, r, h]);
+                    
+                    for (x=[-sw/2+t, sw/2-t]) {
+                        translate([x-t, r, sh])
                         difference() {
-                            translate([-(2*t)/2, 0, 0])
-                                cube([2*t, e, h-2]);
+                            cube([2*t, e, h-sh]);
                             
-                            translate([-(2*t+0.1)/2, e, 0])
-                            rotate([atan(e/(h-2)), 0, 0])
-                                cube([2*t+0.1, e, sqrt(pow(tube_od/2, 2)+pow(h-2, 2))]);
+                            translate([-0.05, e, 0])
+                            rotate([atan(e/(h-sh)), 0, 0])
+                                cube([2*t+0.1, e, sqrt(pow(tube_od/2, 2)+pow(h-sh, 2))]);
                         }
                     }
                 }
@@ -199,30 +204,32 @@ module hotend_mount() {
             
             rotate([0, 0, 240])
             translate([-(layer_fan_width+2*t)/2, 0, 0])
-                cube([layer_fan_width+2*t, hotend_mount_od/2, layer_fan_mount_height]);
+                cube([layer_fan_width+2*t, layer_fan_offset-0.2, h]);
         }
-        
-        union() {
-            for (a=[0, 120]) {
-                rotate([0, 0, a]) {
-                    translate([0, 20, 15 + 1])
+
+        for (a=[0, 120]) {
+            rotate([0, 0, a]) {
+                translate([-(sw-4*t)/2, 0, sh])
+                    cube([sw-4*t, r+e, 29]);
+
+                for (b=[-5, 5]) {
+                    translate([b, sd/2, sh+5.5/2])           
                     rotate([90, 0, 0])
-                        cylinder(d=27, h=20, $fn=80);
-                    
-                    translate([-27/2, 0, 2])
-                        cube([27, 27, 15]);
+                        #cylinder(d=3.3, h=10, $fn=16, center=true);
                 }
             }
-
-            translate([0, 0, -1])
-                cylinder(d=16.3, h=45, $fn=80);
-
-            translate([0, 0, -1])
-                cylinder(d=23, h=31, $fn=80);
-
-            translate([0, 0, 2])
-                cylinder(d=27, h=28, $fn=80);
         }
+        
+        // hotend cut-out start
+        translate([0, 0, -0.05])
+            cylinder(d=16.3, h=h+0.1, $fn=80);
+        
+        translate([0, 0, sh])
+            cylinder(d=hotend_mount_od-2*t, h=29, $fn=80);
+        
+        translate([0, 0, -0.05])
+            cylinder(d=23, h=sh+0.1, $fn=80);
+        // hotend cut-out end
     }
 }
 
@@ -233,12 +240,12 @@ difference() {
 
 hotend_mount();
 
-*rotate([0, 0, -120])
+rotate([0, 0, -120])
     #e3d_lite();
 
-*rotate([0, 0, 120])
-translate([0, 15, tube_height+15])
+rotate([0, 0, 120])
+translate([0, hotend_mount_od/2, tube_height+support_height+fan_diameter/2])
 translate([0, 10, 0])
 rotate([90, 0, 0])
-    fan(30, 10);
+    fan(fan_diameter, 10);
 

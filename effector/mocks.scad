@@ -1,6 +1,6 @@
 module e3d_lite() {
     rotate([0, 0, 0])
-    translate([0, 0, 14.7+2]) {
+    translate([0, 0, 16.7]) {
         translate([0, 0, 39])
             cylinder(d=16, h=3.7, $fn=20);
         
