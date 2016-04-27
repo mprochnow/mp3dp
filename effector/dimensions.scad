@@ -17,9 +17,13 @@ tube_opening_width = 3;
 
 fan_diameter = 30;
 
+heat_sink_height = 30;
+lower_groove_mount_height = 3;
+
 support_height = 2 * wall_thickness;
 support_width = fan_diameter + play + 4 * wall_thickness;
-hotend_mount_od = 2 * 0.5 * support_width / cos(30); //35;
+hotend_mount_od = 2 * 0.5 * support_width / cos(30);
+hotend_mount_height = heat_sink_height + lower_groove_mount_height;
 
 layer_fan_offset = hotend_mount_od/2+0.2; // offset of layer fan from center
 layer_fan_width = 19.5 + play;

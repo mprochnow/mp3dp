@@ -45,7 +45,6 @@ module duct_outline(w, h) {
                     [-w/2+h, h],
                     [-w/2,0]],
             paths=[[0, 1, 2, 3, 4, 5]]);
-    
 }
 
 module layer_fan_lower_mount() {
@@ -56,7 +55,7 @@ module layer_fan_lower_mount() {
     c = sqrt(pow(a, 2) + pow(b, 2));
     l = sqrt(pow(c , 2) - pow(r, 2));
     m = atan(b / a) + asin(r / c);
-    
+
     difference() {
         union() {
             rotate([0, -m, 0])
@@ -67,7 +66,7 @@ module layer_fan_lower_mount() {
             rotate([90, 0, 0])
                 cylinder(r=r, h=layer_fan_width+2*t+t, $fn=40);
         }
-        
+
         // screw hole
         translate([a, (layer_fan_width+2*t+0.1)/2+t, b])
         rotate([90, 0, 0])
@@ -77,12 +76,12 @@ module layer_fan_lower_mount() {
         translate([a, -(layer_fan_width+2*t)/2+3, b])
         rotate([90, 0, 0])
             cylinder(d=5.8, h=3.1, $fn=20);
-        
+
         // nut trap
         translate([a, (layer_fan_width+2*t)/2+2.4, b])
         rotate([90, 30, 0])
             cylinder(d=5.8/sin(60), h=2.4, $fn=6);
-        
+
         // cutout for fan mount
         translate([(a+r+0.1)/2, (layer_fan_width-layer_fan_mount_width)/2, 0])
             cube([a+r+0.1, layer_fan_mount_width, tube_height+layer_fan_mount_height], center=true);
@@ -93,11 +92,12 @@ module outer_tube() {
     t = wall_thickness;
     w = tube_od/2 - tube_id/2;
     h = tube_height;
-    
+    d = tube_od-((tube_od-tube_id)/2)/3;
+
     difference() {
         union() {
             magnet_holder_slice();
-            
+
             rotate_extrude($fn=tube_resolution) {
                 translate([tube_id/2+w/2,0,0])
                     duct_outline(w, h);
@@ -111,9 +111,44 @@ module outer_tube() {
                 translate([layer_fan_offset+t+layer_fan_depth+t, 0, h])
                     layer_fan_lower_mount();
             }
-            
+
+            // central "wind shield"
             cylinder(d=tube_id+2, h=t, $fn=tube_resolution);
+            
+            translate([0, 0, tube_height-sin(45)*8*t])
+            intersection () {
+                difference() {
+                    cylinder(d=d+8*t, h=2*t+7+sin(45)*8*t, $fn=tube_resolution);
+                
+                    translate([0, 0, -0.05])
+                        cylinder(d=d, h=2*t+7+sin(45)*8*t+0.1, $fn=tube_resolution);
+                }
+                
+                union() {
+                    for (a=[0, 120]) {
+                        rotate([0, 0, a])
+                        difference() {
+                            translate([-9, 0, 0])
+                                cube([18, (d+8*t)/2, 2*t+7+sin(45)*8*t]);
+
+                            // mount screw holes
+                            for (b=[-5, 5]) {
+                                translate([b, (d+8*t)/2-4*t, sin(45)*8*t+support_height+5.5/2]) {
+                                    rotate([90, 0, 0])
+                                        cylinder(d=3.3, h=10, $fn=16, center=true);
+
+                                    translate([0, 10+2.4, 0])
+                                    rotate([90, 0, 0])
+                                        cylinder(d=5.8, h=10, $fn=16);
+                                }
+                            }
+                            
+                        }
+                    }
+                }
+            }
         }
+
         translate([0, 0, -0.05])
             cylinder(d=10, h=t+0.1, $fn=20);
     }
@@ -123,7 +158,7 @@ module inner_tube() {
     t = wall_thickness;
     w = tube_od/2 - tube_id/2 - t - 2*t;
     h = tube_height - 2 * t;
-    
+
     translate([0, 0, t])
     rotate_extrude($fn=tube_resolution) {
         translate([tube_id/2+w/2+2*t, 0, 0])
@@ -136,7 +171,7 @@ module inner_tube() {
         translate([tube_id/2+t+tube_opening_width/2, 0, 0])
         rotate([0, 0, 45])
             square([tube_opening_width, sin(45)*tube_opening_width]);
-    
+
         for(a=[0:12])
             rotate([0, 0, a*360/12])
             translate([-wall_thickness, 0, -0.1])
@@ -164,14 +199,14 @@ module inner_tube() {
 module hotend_mount() {
     t = wall_thickness;
     r = hotend_mount_od/2;
-    h = 33;
-    
+    h = hotend_mount_height;
+
     sh = support_height;
     sw = support_width;
     sd = tube_od-((tube_od-tube_id)/2)/3 - 0.2;
 
     e = sqrt(pow(sd, 2) - pow(sw, 2))/2 - r;
-    
+
     translate([0, 0, tube_height])
     difference() {
         union() {
@@ -180,20 +215,25 @@ module hotend_mount() {
             for (a=[0, 120]) {
                 rotate([0, 0, a]) {
                     intersection() {
-                        translate([-sw/2, 0, 0])
-                            cube([sw, sd, sh]);
-                        
+                        union() {
+                            translate([-sw/2, 0, 0])
+                                cube([sw, sd, sh]);
+
+                            translate([-9, sd/2-4*t, sh])
+                                cube([18, 4*t, 7]);
+                        }
+
                         cylinder(d=sd, h=h, $fn=tube_resolution);
                     }
-                    
+
                     translate([-sw/2, 0, 0])
                         cube([sw, r, h]);
-                    
+
                     for (x=[-sw/2+t, sw/2-t]) {
                         translate([x-t, r, sh])
                         difference() {
                             cube([2*t, e, h-sh]);
-                            
+
                             translate([-0.05, e, 0])
                             rotate([atan(e/(h-sh)), 0, 0])
                                 cube([2*t+0.1, e, sqrt(pow(tube_od/2, 2)+pow(h-sh, 2))]);
@@ -201,7 +241,7 @@ module hotend_mount() {
                     }
                 }
             }
-            
+
             rotate([0, 0, 240])
             translate([-(layer_fan_width+2*t)/2, 0, 0])
                 cube([layer_fan_width+2*t, layer_fan_offset-0.2, h]);
@@ -210,23 +250,24 @@ module hotend_mount() {
         for (a=[0, 120]) {
             rotate([0, 0, a]) {
                 translate([-(sw-4*t)/2, 0, sh])
-                    cube([sw-4*t, r+e, 29]);
+                    cube([sw-4*t, r+e, h-sh-lower_groove_mount_height]);
 
+                // mount screw holes
                 for (b=[-5, 5]) {
                     translate([b, sd/2, sh+5.5/2])           
                     rotate([90, 0, 0])
-                        #cylinder(d=3.3, h=10, $fn=16, center=true);
+                        cylinder(d=3.3, h=10, $fn=16, center=true);
                 }
             }
         }
-        
+
         // hotend cut-out start
         translate([0, 0, -0.05])
             cylinder(d=16.3, h=h+0.1, $fn=80);
-        
+
         translate([0, 0, sh])
-            cylinder(d=hotend_mount_od-2*t, h=29, $fn=80);
-        
+            cylinder(d=hotend_mount_od-2*t, h=h-sh-lower_groove_mount_height, $fn=80);
+
         translate([0, 0, -0.05])
             cylinder(d=23, h=sh+0.1, $fn=80);
         // hotend cut-out end
@@ -247,5 +288,5 @@ rotate([0, 0, 120])
 translate([0, hotend_mount_od/2, tube_height+support_height+fan_diameter/2])
 translate([0, 10, 0])
 rotate([90, 0, 0])
-    fan(fan_diameter, 10);
+    #fan(fan_diameter, 10);
 
