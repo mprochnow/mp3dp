@@ -196,6 +196,49 @@ module inner_tube() {
     }
 }
 
+module fan_mount_plate() {
+    t = wall_thickness;
+    w = support_width - 4 * t;
+    d = hotend_mount_height - support_height - lower_groove_mount_height;
+    p = 12;
+    
+    translate([0, d/2, t])
+    difference() {
+        cube([w, d, 2*t], center=true);
+        
+        translate([0, .75, 0]) {
+            cylinder(d=28, h=2*t+0.1, $fn=80, center=true);
+            
+            for (x = [-p, p]) {
+                for (y = [-p ,p]) {
+                    translate([x, y, 0])
+                        cylinder(d=3.3, h=2*t+0.1, $fn=16, center=true);
+                }
+            }
+        }
+    }
+}
+
+module layer_fan_upper_mount() {
+    t=wall_thickness;
+    
+    translate([2.7, 0, 37.8])
+    difference() {
+        union() {
+            rotate([0, -45, 0])
+            translate([-20, -(layer_fan_width+2*t)/2, -4])
+                cube([20, layer_fan_width+2*t, 8]);
+            
+            rotate([90, 0, 0])
+            translate([0, 0, -t/2])
+                cylinder(d=8, h=layer_fan_width+2*t+t, $fn=20, center=true);
+        }
+
+        rotate([90, 0, 0])
+            cylinder(d=3.3, h=layer_fan_width+2*t+t+0.1, $fn=20, center=true);
+    }
+}
+
 module hotend_mount() {
     t = wall_thickness;
     r = hotend_mount_od/2;
@@ -207,7 +250,7 @@ module hotend_mount() {
 
     e = sqrt(pow(sd, 2) - pow(sw, 2))/2 - r;
 
-    translate([0, 0, tube_height])
+    translate([0, 0, tube_height]) {
     difference() {
         union() {
             cylinder(d=hotend_mount_od, h=h, $fn=80);
@@ -245,6 +288,10 @@ module hotend_mount() {
             rotate([0, 0, 240])
             translate([-(layer_fan_width+2*t)/2, 0, 0])
                 cube([layer_fan_width+2*t, layer_fan_offset-0.2, h]);
+            
+            rotate([0, 0, 330])
+            translate([layer_fan_offset+t, 0, 0])
+                layer_fan_upper_mount();
         }
 
         for (a=[0, 120]) {
@@ -272,6 +319,12 @@ module hotend_mount() {
             cylinder(d=23, h=sh+0.1, $fn=80);
         // hotend cut-out end
     }
+    
+    rotate([0, 0, 120])
+    translate([0, r, sh])
+    rotate([90, 0, 0])
+        fan_mount_plate();
+    }
 }
 
 difference() {
@@ -289,4 +342,3 @@ translate([0, hotend_mount_od/2, tube_height+support_height+fan_diameter/2])
 translate([0, 10, 0])
 rotate([90, 0, 0])
     #fan(fan_diameter, 10);
-

@@ -46,6 +46,7 @@ module fan(w, h, o=3) {
 
         cylinder(d=w-2, h=h+1, center=true, $fn=80);
         
+        render()
         for (x = [-p, p]) {
             for (y = [-p ,p]) {
                 translate([x, y, 0])
