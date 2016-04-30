@@ -19,6 +19,7 @@ fan_diameter = 30;
 
 heat_sink_height = 30;
 lower_groove_mount_height = 3;
+groove_mount_height = 12.7;
 
 support_height = 2 * wall_thickness;
 support_width = fan_diameter + play + 4 * wall_thickness;
