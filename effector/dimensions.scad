@@ -16,6 +16,7 @@ tube_height = 16.7;
 tube_opening_width = 3;
 
 fan_diameter = 30;
+fan_width = 10.3;
 
 heat_sink_height = 30;
 lower_groove_mount_height = 3;
