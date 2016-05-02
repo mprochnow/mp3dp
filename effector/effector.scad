@@ -361,12 +361,53 @@ module hotend_mount() {
     }
 }
 
+module hotend_holder() {
+    t = wall_thickness;
+    h = groove_mount_height - lower_groove_mount_height;
+    r = hotend_mount_od/2;
+
+    translate([0, 0, tube_height+hotend_mount_height])
+    difference() {
+        cylinder(d=hotend_mount_od, h=h, $fn=120);
+        
+        translate([0, 0, 5.9])
+            cylinder(d=16+play, h=4, $fn=120);
+
+        translate([0, 0, -0.1])
+            cylinder(d=12+play, h=6, $fn=120);
+
+        render()
+        rotate([0, 0, 60]) {
+            translate([-(hotend_mount_od+0.1)/2, -8+2*t-hotend_mount_od+0.1, -0.05])
+                cube([hotend_mount_od+0.1, hotend_mount_od, h+0.1]);
+            
+            translate([-16.1/2, -r, 5.9])
+                cube([16.1, r, 4]);
+
+            translate([-12.1/2, -r, -0.1])
+                cube([12.1, r, 6]);
+            
+            for (x=[-1, 1]) {
+                translate([x*(8+t+3.3/2), 0, h/2])
+                rotate([90, 0, 0])
+                    cylinder(d=3.3, h=hotend_mount_od+1, $fn=16, center=true);
+
+                
+                translate([x*(8+t+3.3/2), 30+9.4, h/2])
+                rotate([90, 0, 0])
+                    cylinder(d=5.8, h=30, $fn=16);
+            }
+        }
+    }
+}
+
 difference() {
     outer_tube();
     inner_tube();
 }
 
 hotend_mount();
+hotend_holder();
 
 rotate([0, 0, -120])
     #e3d_lite();
