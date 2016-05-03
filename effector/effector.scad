@@ -348,10 +348,11 @@ module hotend_mount() {
                 rotate([90, 0, 0])
                     cylinder(d=3.3, h=20, $fn=16, center=true);
                 
-                translate([-6.4/2, -3/2-8-2*t, -5.8/2])
+                translate([-6.4/2, -3/2-8-2*t, -5.5/2])
                     cube([6.4, 3, 10]);
             }
-            translate([x*(6+r/2)-r/2, -8+2*t, h])
+
+            translate([x*(6+r/2)-r/2, 0, h])
                 cube([r, 30, groove_mount_height]);
         }
         
@@ -373,25 +374,17 @@ module hotend_holder() {
         translate([0, 0, 5.9])
             cylinder(d=16+play, h=4, $fn=120);
 
-        translate([0, 0, -0.1])
+        translate([0, 0, -0.05])
             cylinder(d=12+play, h=6, $fn=120);
 
-        render()
         rotate([0, 0, 60]) {
-            translate([-(hotend_mount_od+0.1)/2, -8+2*t-hotend_mount_od+0.1, -0.05])
+            translate([-(hotend_mount_od+0.1)/2, -hotend_mount_od+0.1, -0.05])
                 cube([hotend_mount_od+0.1, hotend_mount_od, h+0.1]);
-            
-            translate([-16.1/2, -r, 5.9])
-                cube([16.1, r, 4]);
-
-            translate([-12.1/2, -r, -0.1])
-                cube([12.1, r, 6]);
             
             for (x=[-1, 1]) {
                 translate([x*(8+t+3.3/2), 0, h/2])
                 rotate([90, 0, 0])
                     cylinder(d=3.3, h=hotend_mount_od+1, $fn=16, center=true);
-
                 
                 translate([x*(8+t+3.3/2), 30+9.4, h/2])
                 rotate([90, 0, 0])
