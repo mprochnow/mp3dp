@@ -250,61 +250,57 @@ module hotend_mount() {
     difference() {
         union() {
             difference() {
-                cylinder(d=hotend_mount_od, h=heat_sink_height+groove_mount_height, $fn=80);
-        
-                for (a=[0, 120]) {
-                    rotate([0, 0, a]) {
-                        translate([-(sw-4*t)/2, 0, sh])
-                        cube([sw-4*t, r+0.1, h-sh-lower_groove_mount_height]);
+                union() {
+                    cylinder(d=hotend_mount_od, h=heat_sink_height+groove_mount_height, $fn=80);
+                    
+                    for (a=[0, 120]) {
+                        rotate([0, 0, a]) {
+                            translate([-sw/2, 0, 0])
+                                cube([sw, r, h]);
+
+                            difference() {
+                                intersection() {
+                                    cylinder(d=sd, h=sh+5.8, $fn=tube_resolution);
+                                    
+                                    translate([-sw/2, 0, 0])
+                                        cube([sw, sd/2, sh+5.8]);
+                                }
+                                
+                                translate([0, 0, sh])
+                                intersection() {
+                                    cylinder(d=sd-4*t, h=sh+5.8, $fn=tube_resolution);
+                                    
+                                    translate([-(sw-4*t)/2, 0, 0])
+                                        cube([sw-4*t, sd/2, sh+5.8]);
+                                }
+
+                                // mount screw holes
+                                for (b=[-12, 12]) {
+                                    rotate([0, 0, b])
+                                    translate([0, sd/2, sh+5.8/2])
+                                    rotate([90, 0, 0])
+                                        cylinder(d=3.3, h=10, $fn=16, center=true);
+                                }
+                            }
+
+                            for (x=[-sw/2+t, sw/2-t]) {
+                                translate([x-t, r, sh+5.8])
+                                difference() {
+                                    cube([2*t, e, h-sh-5.8]);
+
+                                    translate([-0.05, e, 0])
+                                    rotate([atan(e/(h-sh-5.8)), 0, 0])
+                                        cube([2*t+0.1, e, sqrt(pow(tube_od/2, 2)+pow(h-sh-5.8, 2))]);
+                                }
+                            }
+                        }
                     }
                 }
-            }
 
-            for (a=[0, 120]) {
-                rotate([0, 0, a]) {
-                    difference() {
-                        intersection() {
-                            cylinder(d=sd, h=sh+5.8, $fn=tube_resolution);
-                            
-                            translate([-sw/2, 0, 0])
-                                cube([sw, sd/2, sh+5.8]);
-                        }
-                        
-                        translate([0, 0, sh])
-                        intersection() {
-                            cylinder(d=sd-4*t, h=sh+5.8, $fn=tube_resolution);
-                            
-                            translate([-(sw-4*t)/2, 0, 0])
-                                cube([sw-4*t, sd/2, sh+5.8]);
-                        }
-
-                        // mount screw holes
-                        for (b=[-12, 12]) {
-                            rotate([0, 0, b])
-                            translate([0, sd/2, sh+5.8/2])
-                            rotate([90, 0, 0])
-                                cylinder(d=3.3, h=10, $fn=16, center=true);
-                        }
-                    }
-
-                    difference() {
-                        translate([-sw/2, 0, 0])
-                            cube([sw, r, h]);
-
-                        translate([-(sw-4*t)/2, 0, sh])
-                            cube([sw-4*t, r+e, h-sh-lower_groove_mount_height]);
-                    }
-
-                    for (x=[-sw/2+t, sw/2-t]) {
-                        translate([x-t, r, sh+5.8])
-                        difference() {
-                            cube([2*t, e, h-sh-5.8]);
-
-                            translate([-0.05, e, 0])
-                            rotate([atan(e/(h-sh-5.8)), 0, 0])
-                                cube([2*t+0.1, e, sqrt(pow(tube_od/2, 2)+pow(h-sh-5.8, 2))]);
-                        }
-                    }
+                for (a=[0, 120]) {
+                    rotate([0, 0, a])
+                    translate([-(sw-4*t)/2, 0, sh])
+                        cube([sw-4*t, r+0.1, h-sh-lower_groove_mount_height]);
                 }
             }
 
@@ -335,12 +331,12 @@ module hotend_mount() {
             cylinder(d=16.3, h=heat_sink_height+groove_mount_height+0.1, $fn=120);
 
         translate([0, 0, sh])
-            cylinder(d=hotend_mount_od-2*t, h=h-sh-lower_groove_mount_height, $fn=120);
+            cylinder(d=hotend_mount_od-4*t, h=h-sh-lower_groove_mount_height, $fn=120);
 
         translate([0, 0, -0.05])
             cylinder(d=23, h=sh+0.1, $fn=120);
         // hotend cut-out end
-        
+
         rotate([0, 0, 60])
         for (x=[-1, 1]) {
             translate([x*(8+t+3.3/2), 0, h+9.7/2])
