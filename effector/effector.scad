@@ -199,12 +199,19 @@ module layer_fan_upper_mount() {
     translate([2.7, 0, layer_fan_mount_hole_x])
     difference() {
         union() {
-            rotate([0, -45, 0])
-            translate([-10, -(layer_fan_width+2*t)/2, -4])
-                cube([10, layer_fan_width+2*t, 8]);
-            
-            translate([-10, -(layer_fan_width+2*t)/2, -4])
-                cube([10, layer_fan_width+2*t, 8]);
+            difference() {
+                union() {
+                    rotate([0, -45, 0])
+                    translate([-10, -(layer_fan_width+2*t)/2, -4])
+                        cube([10, layer_fan_width+2*t, 8]);
+                    
+                    translate([-10, -(layer_fan_width+2*t)/2, -4])
+                        cube([10, layer_fan_width+2*t, 8]);
+                }
+
+                translate([-10-3.5, -50, -50])
+                    cube([10, 100, 100]);
+            }
 
             rotate([90, 0, 0])
             translate([0, 0, -t/2])
@@ -229,9 +236,6 @@ module layer_fan_upper_mount() {
         // cutout for fan mount
         translate([0, (layer_fan_width-layer_fan_mount_width)/2, 0])
             cube([22, layer_fan_mount_width, 20], center=true);
-        
-        translate([-10-3.5, -50, -50])
-            cube([10, 100, 100]);
     }
 }
 
@@ -358,6 +362,83 @@ module hotend_mount() {
     }
 }
 
+module upper_part_support() {
+    t = wall_thickness;
+    r = hotend_mount_od/2;
+    h = hotend_mount_height-support_height-lower_groove_mount_height-3*layer_height-0.3;
+    w = support_width - 4 * t - 2;
+
+    cylinder(d=22, h=support_height, $fn=120);
+
+    translate([0, 0, support_height]) {
+        difference() {
+            cylinder(d1=22, d2=hotend_mount_od-4*t-1, h=h, $fn=120);
+            cylinder(d1=22-t, d2=hotend_mount_od-4*t-1-t, h=h+0.1, $fn=30);
+        }
+
+        difference() {
+            cylinder(d1=18, d2=hotend_mount_od-4*t-6, h=h, $fn=120);
+            cylinder(d1=18-t, d2=hotend_mount_od-4*t-6-t, h=h+0.1, $fn=30);
+        }
+
+        difference() {
+            cylinder(d1=14, d2=hotend_mount_od-4*t-12, h=h, $fn=120);
+            cylinder(d1=14-t, d2=hotend_mount_od-4*t-12-t, h=h+0.1, $fn=30);
+        }
+
+        difference() {
+            cylinder(d1=10, d2=hotend_mount_od-4*t-18, h=h, $fn=120);
+            cylinder(d1=10-t, d2=hotend_mount_od-4*t-18-t, h=h+0.1, $fn=300);
+        }
+
+        difference() {
+            cylinder(d1=6, d2=hotend_mount_od-4*t-24, h=h, $fn=120);
+            cylinder(d1=6-t, d2=hotend_mount_od-4*t-24-t, h=h+0.1, $fn=30);
+        }
+        
+        difference() {
+            union() {
+                for (a=[0, 120])
+                    rotate([0, 0, a])
+                    hull() {
+                        cylinder(d=22, h=1, $fn=30);
+                        
+                        translate([-w/2, 0, h-1])
+                            cube([w, r+2, 1]);
+                    }
+            }
+            
+            for (a=[0, 120])
+                rotate([0, 0, a])
+                translate([0, -t/2, 0])
+                hull() {
+                    cylinder(d=22, h=1, $fn=30);
+                    
+                    translate([-(w-t)/2, 0, h-1])
+                        cube([w-t, r+2, 1.1]);
+                }
+
+            cylinder(d1=22-t, d2=hotend_mount_od-4*t-1-t, h=h+0.1, $fn=30);
+        }
+    }
+    
+    translate([0, 0, support_height+h]) {
+        difference() {
+            union() {
+                cylinder(d=hotend_mount_od-4*t-1, h=3*layer_height, $fn=30);
+                
+                for (a=[0, 120])
+                    rotate([0, 0, a])
+                    translate([-w/2, 0, 0])
+                        cube([w, r+2, 3*layer_height]);
+            }
+            
+            translate([0, 0, -0.05])
+                cylinder(d=hotend_mount_od-4*t-24-t, h=3*layer_height+0.1, $fn=30);
+        }
+    }
+}
+
 module hotend_holder() {
     t = wall_thickness;
     h = groove_mount_height - lower_groove_mount_height;
@@ -396,6 +477,9 @@ difference() {
 }
 
 hotend_mount();
+*translate([0, 0, tube_height])
+    upper_part_support();
+
 hotend_holder();
 
 rotate([0, 0, -120])
