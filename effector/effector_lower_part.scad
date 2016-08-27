@@ -158,27 +158,11 @@ module inner_tube() {
                             [w/2-tt, h-h/4],
                             [w/2-h/4, h-tt],
                             [-w/2+h, h-tt],
-                            [-w/2+2*tt+h/6, tt+h/6],
-                            [-w/2+2*tt+h/3, tt]]);
+                            [-w/2+tt-0.1, -0.1],
+                            [-w/2+2*tt+h/4+tt+0.1, -0.1],
+                            [-w/2+2*tt+h/4, tt]]);
     }
     
-    difference() {
-        rotate_extrude($fn=tube_resolution) {
-            translate([tube_id/2+w/2, 0, 0])
-                polygon(points=[[-w/2+2*tt+h/6+0.1, tt+h/6+0.1],
-                                [-w/2+2*tt+h/3+0.1, tt],
-                                [-w/2+2*tt+h/3, tt],
-                                [-w/2+2*tt+h/3+tt+0.1, -0.1],
-                                [-w/2+tt-0.1, -0.1]]);
-        }
-
-        for(a=[0:12]) {
-            rotate([0, 0, a*360/12])
-            translate([-tt/2, 0, -0.1])
-                cube([tt, tube_od, h/2]);
-        }
-    }
-
     // radial fan mount
     rotate([0, 0, 330]) {
         translate([layer_fan_offset+tt, -(layer_fan_width-1.25*tt)/2, tt+0.1])
@@ -197,11 +181,41 @@ module inner_tube() {
     }
 }
 
-difference() {
-    outer_tube();
-    inner_tube();
+module effector_lower_part() {
+    t = wall_thickness;
+    tt = 4.5 * nozzle_width;
+    w = tube_od/2 - tube_id/2;
+    h = tube_height;
 
-    *rotate([0, 0, 340])
+    difference() {
+        outer_tube();
+        inner_tube();
+    }
+
+    intersection() {
+        for(a=[0:12]) {
+            rotate([0, 0, a*360/12])
+            translate([-tt/2, 0, -0.1])
+                cube([tt, tube_od, h/2]);
+        }
+
+        rotate_extrude($fn=tube_resolution) {
+            translate([tube_id/2+w/2, 0, 0])
+                polygon(points=[[-w/2+2*tt+h/12-0.2, tt+h/12],
+                                [-w/2+2*tt+h/4, tt],
+                                [-w/2+2*tt+h/4, tt],
+                                [-w/2+2*tt+h/4+tt, 0],
+                                [-w/2+tt, 0]]);
+        }
+
+    }
+
+}
+
+difference() {
+    effector_lower_part();
+
+    *rotate([0, 0, 330])
     translate([-(2*tube_od)/2, -(tube_od+10)/2, -1])
         cube([2*tube_od,(tube_od+10)/2, 100+2]); 
 }
