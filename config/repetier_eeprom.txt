@@ -1,7 +1,7 @@
 EPR:0 1028 255 Language
 EPR:2 75 250000 Baudrate
-EPR:3 129 355.202 Filament printed [m]
-EPR:2 125 278430 Printer active [s]
+EPR:3 129 360.663 Filament printed [m]
+EPR:2 125 287494 Printer active [s]
 EPR:2 79 0 Max. inactive time [ms,0=off]
 EPR:2 83 30000 Stop stepper after inactivity [ms,0=off]
 EPR:3 11 80.0000 Steps per mm
@@ -13,7 +13,7 @@ EPR:3 137 0.000 Y min pos [mm]
 EPR:3 141 0.000 Z min pos [mm]
 EPR:3 145 200.000 X max length [mm]
 EPR:3 149 200.000 Y max length [mm]
-EPR:3 153 183.600 Z max length [mm]
+EPR:3 153 183.550 Z max length [mm]
 EPR:1 891 600 Segments/s for travel
 EPR:1 889 600 Segments/s for printing
 EPR:3 59 1000.000 Acceleration [mm/s^2]
@@ -21,9 +21,9 @@ EPR:3 71 2000.000 Travel acceleration [mm/s^2]
 EPR:3 881 214.615 Diagonal rod length [mm]
 EPR:3 885 107.100 Horizontal rod radius at 0,0 [mm]
 EPR:3 925 90.000 Max printable radius [mm]
-EPR:1 893 40 Tower X endstop offset [steps]
-EPR:1 895 92 Tower Y endstop offset [steps]
-EPR:1 897 180 Tower Z endstop offset [steps]
+EPR:1 893 32 Tower X endstop offset [steps]
+EPR:1 895 60 Tower Y endstop offset [steps]
+EPR:1 897 156 Tower Z endstop offset [steps]
 EPR:3 901 210.000 Alpha A(210):
 EPR:3 905 330.000 Alpha B(330):
 EPR:3 909 90.000 Alpha C(90):
@@ -49,9 +49,9 @@ EPR:3 212 10000.000 Extr.1 acceleration [mm/s^2]
 EPR:0 216 1 Extr.1 heat manager [0-3]
 EPR:0 217 255 Extr.1 PID drive max
 EPR:0 245 40 Extr.1 PID drive min
-EPR:3 218 32.3200 Extr.1 PID P-gain/dead-time
-EPR:3 222 4.8000 Extr.1 PID I-gain
-EPR:3 226 54.4500 Extr.1 PID D-gain
+EPR:3 218 12.0000 Extr.1 PID P-gain/dead-time
+EPR:3 222 0.9200 Extr.1 PID I-gain
+EPR:3 226 39.2300 Extr.1 PID D-gain
 EPR:0 230 255 Extr.1 PID max value [0-255]
 EPR:2 231 0 Extr.1 X-offset [steps]
 EPR:2 235 0 Extr.1 Y-offset [steps]
