@@ -23,11 +23,11 @@ module mount() {
             translate([distance_rods/4, w_pulley/2 + t_wall / 2 + 1, -(h_idler/2) + 5/2])        
                 cube([distance_rods/2, t_wall, 5], center=true);
 
-            translate([distance_rods/4, w_pulley/2 + t_wall / 2 - 1, 5/2])        
-                cube([distance_rods/2, t_wall - 4, 15], center=true);
+            translate([distance_rods/4, w_pulley/2 + 1 + t_wall / 2, 5/2])        
+                cube([distance_rods/2, t_wall, 15], center=true);
         }
     
-            cylinder(r=d_rod/2, h=h_idler + 1, center=true, $fn=q);
+        cylinder(r=d_rod/2, h=h_idler + 1, center=true, $fn=q);
 
         translate([0, -10, 0])            
             cube([2.5, 20, h_idler + 1], center=true);
@@ -35,14 +35,14 @@ module mount() {
         translate([0, -8, 0])
         rotate([90, 0, 90])
         union() {
-            cylinder(r=3.3/2, h=17, center=true, $fn=q);
+            cylinder(d=3.3, h=17, center=true, $fn=q);
 
             translate([0, 0, 8])
             rotate([0, 0, 30])
-                m3_nut();
+                m3_nut(5.7);
 
             translate([0, 0, -8])       
-                cylinder(r=2.7, h=3, center=true, $fn=q);
+                cylinder(d=5.5, h=3, center=true, $fn=q);
         }
     
     }
@@ -58,13 +58,6 @@ union() {
             mirror([1, 0, 0])
                 mount();
             
-            translate([-(distance_rods/2), 6.55, -10])
-                cube([16, 6, 20]);
-                
-            translate([-(distance_rods/2 - 15.9) , 4.55, -10])
-            rotate([0, 0, 45])
-                cube([5.7, 5.6, 20]);
-        
             translate([-2.5, 0, 2.5]) 
             difference() {
                 union() {

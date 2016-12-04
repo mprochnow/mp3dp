@@ -91,20 +91,6 @@ module bearing_mount() {
     }
 };
 
-module belt_mount() {
-    difference() {
-        cube([13, w_belt, h_belt_mount], center=true);
-
-        translate([0, 0.5, 10.2])
-        rotate([0, 90, 0])
-        rotate([-90, 0, 0])
-	        scale(1.02) belt_len(profile = tT2_5, belt_width = w_belt+1, len = h_belt_mount * 2);
-    
-        translate([0.8, 0, 0])
-            cube([1, w_belt + 1, h_belt_mount + 1], center=true);
-    }
-}
-
 module carriage() {
     union() {
         translate([-(distance_rod / 2), 0, 0])
@@ -124,8 +110,8 @@ module carriage() {
             rotate([-90, 0, 0])
 	            scale(1.02) belt_len(profile = tT2_5, belt_width = w_belt+1, len = h_bearing / 2 + 1);
         
-            translate([7.3, 0, h_bearing/4])
-                cube([1, w_belt + 1, h_bearing/2 + 1.52], center=true);
+            translate([7, 0, h_bearing/4])
+                cube([0.7, w_belt + 1, h_bearing/2 + 1.52], center=true);
         }
        
         // belt tensioner

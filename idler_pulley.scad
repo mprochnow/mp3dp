@@ -9,17 +9,17 @@ pulley_b_ht=idler_ht;
 
 // part 1
 difference() {
-    cylinder(d=motor_shaft+6.2, h=idler_ht, $fn=80);
+    cylinder(d=motor_shaft+12.2, h=idler_ht, $fn=80);
     
     translate([0, 0, -1])
         cylinder(d=10, h=12, $fn=80);    
 }
 
 // part 2
-translate([20, 0, 0])
+translate([30, 0, 0])
 difference() {
     union() {
-            cylinder(d=motor_shaft+6.2, h=idler_ht, $fn=80);
+            cylinder(d=motor_shaft+12.2, h=idler_ht, $fn=80);
         
         translate([0, 0, idler_ht])
             cylinder(d=motor_shaft - 0.2, h=2.1, $fn=motor_shaft*4);
