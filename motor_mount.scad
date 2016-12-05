@@ -20,14 +20,18 @@ module nema17_mount() {
             cube([width, width + 5, height], center = true);
         
         // center hole
-        translate([0, 0, -0.5]    )
-            cylinder(r = 11.25 + 0.1, h = height + 1, $fn = 32);
+        translate([0, 0, -0.5])
+            cylinder(r = 11.25 + 0.1, h = height + 1, $fn = 128);
+
+        translate([0, sin(45)*(11.25 + 0.1), height/2])
+        rotate([0, 0, 45])
+            cube([11.25 + 0.1, 11.25 + 0.1, height+1], center=true);
 
         // mounting holes
         for (a = hole_offsets) {
             translate(a) {
-                polyhole(height * 4, 3.3);
-                polyhole(height + 1, 5.7, center=false);
+                cylinder(d=3.3, h=height*4, center=true, $fn=16);
+                cylinder(d=5.8, h=height+1, $fn=16);
             }
         }
     }
@@ -48,14 +52,14 @@ module rod_mount() {
             translate([width/2 + 8.85, 0, height + 0.7])
             rotate([0, 22, 0])
             rotate([90, 0, 0])        
-                cylinder(r=9.55, h=width + 5, center=true, $fn=8);
+                cylinder(d=17.76, h=width + 5, center=true, $fn=128);
             
             for (y = [width/4, -width/4]) {
 
                 translate([distance_rods/2, y, 20.5])                
                 rotate([22, 0, 0])
                 rotate([0, 90, 0])        
-                    cylinder(r=5.5, h=2*8.85, center=true, $fn=8);
+                    cylinder(d=9, h=2*8.35, center=true, $fn=64);
             }
         
             translate([width/2, 0, 5])
@@ -71,14 +75,14 @@ module rod_mount() {
             translate([distance_rods/2, y, 20.5])
             rotate([0, 270, 0])
             union() {
-                polyhole(17, 3.3);
+                cylinder(d=3.3, h=17, center=true, $fn=16);
 
                 translate([0, 0, 8])
                 rotate([0, 0, 30])
                     m3_nut(width=5.8);
 
                 translate([0, 0, -8])       
-                    polyhole(3, 5.7);  
+                    cylinder(d=5.8, h=3, center=true, $fn=16);  
             }
         }
         
